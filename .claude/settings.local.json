@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__mcp-server-firecrawl__firecrawl_scrape"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
