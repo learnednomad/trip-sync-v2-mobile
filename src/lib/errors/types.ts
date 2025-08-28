@@ -3,13 +3,11 @@
  * Comprehensive error types for API and application errors
  */
 
-import type { ApiError } from '@/api/common/types';
-
 // Error Severity Levels
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
 
 // Error Categories
-export type ErrorCategory = 
+export type ErrorCategory =
   | 'network'
   | 'authentication'
   | 'authorization'
@@ -61,7 +59,8 @@ export interface ErrorDisplayOptions {
   actions?: ErrorAction[];
   duration?: number;
   persistent?: boolean;
-  icon?: string;
+  icon?: 'auto' | 'success' | 'info' | 'warning' | 'danger';
+  silent?: boolean;
 }
 
 // Error Context Information

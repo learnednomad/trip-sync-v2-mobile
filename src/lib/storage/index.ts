@@ -16,4 +16,4 @@ export * from './use-offline-storage';
 export * from './types';
 
 // Legacy compatibility - re-export from original storage
-export { getItem, setItem, removeItem, storage } from '../storage';
+export { getItem, removeItem, setItem, storage } from '../storage';

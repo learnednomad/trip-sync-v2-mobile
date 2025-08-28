@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { showMessage } from 'react-native-flash-message';
 import { z } from 'zod';
 
-import { useAddPost } from '@/api';
+import { useCreateTrip } from '@/api';
 import {
   Button,
   ControlledInput,
@@ -14,64 +14,124 @@ import {
 } from '@/components/ui';
 
 const schema = z.object({
-  title: z.string().min(10),
-  body: z.string().min(120),
+  name: z.string().min(3, 'Trip name must be at least 3 characters'),
+  description: z.string().optional(),
+  destination: z.string().min(2, 'Destination is required'),
+  startDate: z.string(),
+  endDate: z.string(),
+  budgetAmount: z.string().optional(),
+  budgetCurrency: z.string().default('USD'),
 });
 
 type FormType = z.infer<typeof schema>;
 
-export default function AddPost() {
+export default function AddTrip() {
   const { control, handleSubmit } = useForm<FormType>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      budgetCurrency: 'USD',
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0], // 7 days from now
+    },
   });
-  const { mutate: addPost, isPending } = useAddPost();
+  const { mutate: createTrip, isPending } = useCreateTrip();
 
   const onSubmit = (data: FormType) => {
-    console.log(data);
-    addPost(
-      { ...data, userId: 1 },
-      {
-        onSuccess: () => {
-          showMessage({
-            message: 'Post added successfully',
-            type: 'success',
-          });
-          // here you can navigate to the post list and refresh the list data
-          //queryClient.invalidateQueries(usePosts.getKey());
+    const tripData = {
+      ...data,
+      budgetAmount: data.budgetAmount
+        ? parseFloat(data.budgetAmount)
+        : undefined,
+      settings: {
+        visibility: 'participants' as const,
+        permissions: {
+          canInvite: 'all' as const,
+          canEditItinerary: 'all' as const,
+          canAddExpenses: 'all' as const,
+          canSeeExpenses: 'all' as const,
         },
-        onError: () => {
-          showErrorMessage('Error adding post');
+        notifications: {
+          dailyDigest: true,
+          instantUpdates: true,
+          reminderDaysBefore: 1,
         },
-      }
-    );
+      },
+    };
+
+    createTrip(tripData, {
+      onSuccess: () => {
+        showMessage({
+          message: 'Trip created successfully',
+          type: 'success',
+        });
+        router.back();
+      },
+      onError: () => {
+        showErrorMessage('Error creating trip');
+      },
+    });
   };
+
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Add Post',
-          headerBackTitle: 'Feed',
+          title: 'Create Trip',
+          headerBackTitle: 'Home',
         }}
       />
-      <View className="flex-1 p-4 ">
+      <View className="flex-1 p-4">
         <ControlledInput
-          name="title"
-          label="Title"
+          name="name"
+          label="Trip Name"
           control={control}
-          testID="title"
+          testID="trip-name"
         />
         <ControlledInput
-          name="body"
-          label="Content"
+          name="destination"
+          label="Destination"
+          control={control}
+          testID="destination"
+        />
+        <ControlledInput
+          name="description"
+          label="Description (optional)"
           control={control}
           multiline
-          testID="body-input"
+          testID="description"
+        />
+        <ControlledInput
+          name="startDate"
+          label="Start Date (YYYY-MM-DD)"
+          control={control}
+          testID="start-date"
+        />
+        <ControlledInput
+          name="endDate"
+          label="End Date (YYYY-MM-DD)"
+          control={control}
+          testID="end-date"
+        />
+        <ControlledInput
+          name="budgetAmount"
+          label="Budget Amount (optional)"
+          control={control}
+          keyboardType="numeric"
+          testID="budget-amount"
+        />
+        <ControlledInput
+          name="budgetCurrency"
+          label="Currency"
+          control={control}
+          testID="budget-currency"
         />
         <Button
-          label="Add Post"
+          label="Create Trip"
           loading={isPending}
           onPress={handleSubmit(onSubmit)}
-          testID="add-post-button"
+          testID="create-trip-button"
         />
       </View>
     </>

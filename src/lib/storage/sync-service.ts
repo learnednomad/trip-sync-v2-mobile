@@ -3,16 +3,15 @@
  * Coordinates data synchronization between offline storage and remote API
  */
 
-import { QueryClient } from '@tanstack/react-query';
+import { type QueryClient } from '@tanstack/react-query';
+
+import { tripKeys } from '@/api/trips';
 // TODO: Install @react-native-community/netinfo for network detection
 // import NetInfo from '@react-native-community/netinfo';
-
 import * as tripsApi from '@/api/trips/api';
-import * as authApi from '@/api/auth/api';
-import { tripKeys } from '@/api/trips';
 
 import offlineStorage from './offline-storage';
-import type { ChangeOperation, PendingChange, SyncStatus } from './types';
+import type { PendingChange } from './types';
 
 interface SyncResult {
   success: boolean;
@@ -46,14 +45,14 @@ class SyncService {
     // TODO: Implement with @react-native-community/netinfo when available
     // For now, assume online
     this.isOnline = true;
-    
+
     // Mock network listener - replace with actual implementation
     // NetInfo.addEventListener(state => {
     //   const wasOffline = !this.isOnline;
     //   this.isOnline = state.isConnected ?? false;
-    //   
+    //
     //   this.log('Network status:', this.isOnline ? 'online' : 'offline');
-    //   
+    //
     //   // Auto-sync when coming back online
     //   if (wasOffline && this.isOnline) {
     //     this.log('Network restored, starting sync...');
@@ -72,11 +71,11 @@ class SyncService {
 
     this.autoSyncInterval = setInterval(() => {
       if (this.isOnline && !this.syncInProgress) {
-        this.syncPendingChanges().catch(error => {
+        this.syncPendingChanges().catch((error) => {
           this.log('Auto-sync error:', error);
         });
       }
-    }, intervalMs);
+    }, intervalMs) as any;
 
     this.log('Auto-sync started with interval:', intervalMs);
   }
@@ -130,11 +129,11 @@ class SyncService {
       const batchSize = 10;
       for (let i = 0; i < pendingChanges.length; i += batchSize) {
         const batch = pendingChanges.slice(i, i + batchSize);
-        
+
         for (const change of batch) {
           try {
             const syncResult = await this.syncChange(change);
-            
+
             if (syncResult.success) {
               result.syncedCount++;
               offlineStorage.removePendingChange(change.id);
@@ -143,11 +142,15 @@ class SyncService {
               // Conflict handling is done in syncChange
             } else {
               result.failedCount++;
-              result.errors.push(`Failed to sync ${change.entityType}:${change.entityId} - ${syncResult.error}`);
+              result.errors.push(
+                `Failed to sync ${change.entityType}:${change.entityId} - ${syncResult.error}`
+              );
             }
           } catch (error) {
             result.failedCount++;
-            result.errors.push(`Error syncing ${change.entityType}:${change.entityId} - ${error}`);
+            result.errors.push(
+              `Error syncing ${change.entityType}:${change.entityId} - ${error}`
+            );
             this.log('Sync error:', error);
           }
         }
@@ -175,7 +178,10 @@ class SyncService {
         case 'user':
           return await this.syncUserChange(change);
         default:
-          return { success: false, error: `Unknown entity type: ${change.entityType}` };
+          return {
+            success: false,
+            error: `Unknown entity type: ${change.entityType}`,
+          };
       }
     } catch (error) {
       this.log('Sync change error:', error);
@@ -196,11 +202,15 @@ class SyncService {
           const createResponse = await tripsApi.createTrip(data);
           if (createResponse.success) {
             // Update local storage with server response
-            offlineStorage.storeTrip(createResponse.data!.trip.id, createResponse.data!.trip, {
-              syncStatus: 'synced',
-              lastSynced: new Date().toISOString(),
-            });
-            
+            offlineStorage.storeTrip(
+              createResponse.data!.trip.id,
+              createResponse.data!.trip,
+              {
+                syncStatus: 'synced',
+                lastSynced: new Date().toISOString(),
+              }
+            );
+
             // Update query cache
             this.invalidateTripQueries(createResponse.data!.trip.id);
             return { success: true };
@@ -214,12 +224,16 @@ class SyncService {
               syncStatus: 'synced',
               lastSynced: new Date().toISOString(),
             });
-            
+
             this.invalidateTripQueries(entityId);
             return { success: true };
           } else if (updateResponse.error?.code === 'VERSION_CONFLICT') {
             // Handle version conflict
-            await this.handleTripVersionConflict(entityId, data, updateResponse.error.details);
+            await this.handleTripVersionConflict(
+              entityId,
+              data,
+              updateResponse.error.details
+            );
             return { success: false, conflict: true };
           }
           return { success: false, error: updateResponse.error?.message };
@@ -251,7 +265,10 @@ class SyncService {
     const tripId = metadata.tripId;
 
     if (!tripId) {
-      return { success: false, error: 'Trip ID required for participant operations' };
+      return {
+        success: false,
+        error: 'Trip ID required for participant operations',
+      };
     }
 
     try {
@@ -269,9 +286,13 @@ class SyncService {
           return { success: false, error: inviteResponse.error?.message };
 
         case 'update':
-          const updateResponse = await tripsApi.updateParticipant(tripId, entityId, {
-            role: data.role,
-          });
+          const updateResponse = await tripsApi.updateParticipant(
+            tripId,
+            entityId,
+            {
+              role: data.role,
+            }
+          );
           if (updateResponse.success) {
             await this.refreshTripFromServer(tripId);
             return { success: true };
@@ -279,7 +300,10 @@ class SyncService {
           return { success: false, error: updateResponse.error?.message };
 
         case 'delete':
-          const removeResponse = await tripsApi.removeParticipant(tripId, entityId);
+          const removeResponse = await tripsApi.removeParticipant(
+            tripId,
+            entityId
+          );
           if (removeResponse.success) {
             await this.refreshTripFromServer(tripId);
             return { success: true };
@@ -342,7 +366,7 @@ class SyncService {
           syncStatus: 'synced',
           lastSynced: new Date().toISOString(),
         });
-        
+
         this.invalidateTripQueries(tripId);
       }
     } catch (error) {
@@ -369,17 +393,21 @@ class SyncService {
     try {
       const response = await tripsApi.getTripList();
       if (response.success && response.data) {
-        offlineStorage.storeTripsList(response.data.trips, {}, {
-          page: 1,
-          limit: response.data.trips.length,
-          total: response.data.total || response.data.trips.length,
-          hasMore: response.data.hasMore || false,
-        });
+        offlineStorage.storeTripsList(
+          response.data.trips,
+          {},
+          {
+            page: 1,
+            limit: response.data.trips.length,
+            total: response.data.total || response.data.trips.length,
+            hasMore: response.data.hasMore || false,
+          }
+        );
 
         if (this.queryClient) {
           this.queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
         }
-        
+
         return true;
       }
       return false;

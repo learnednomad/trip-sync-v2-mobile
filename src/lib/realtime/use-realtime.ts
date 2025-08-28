@@ -3,13 +3,12 @@
  * React integration for WebSocket real-time communication
  */
 
-import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
 
-import { useAuth } from '@/lib/auth';
 import { tripKeys } from '@/api/trips';
+import { useAuth } from '@/lib/auth';
 
-import realtimeService from './websocket-service';
 import type {
   ConnectionStatus,
   EventHandler,
@@ -17,12 +16,15 @@ import type {
   RealtimeEventType,
   TripSubscription,
 } from './types';
+import realtimeService from './websocket-service';
 
 /**
  * Hook to manage real-time connection status
  */
 export const useRealtimeConnection = () => {
-  const [status, setStatus] = useState<ConnectionStatus>(realtimeService.getStatus());
+  const [status, setStatus] = useState<ConnectionStatus>(
+    realtimeService.getStatus()
+  );
   const [error, setError] = useState<Error | null>(null);
   const { token, status: authStatus } = useAuth();
 
@@ -106,9 +108,13 @@ export const useRealtimeEvent = <T = any>(
 /**
  * Hook to automatically sync trip data with real-time updates
  */
-export const useTripRealtime = (tripId: string, options?: { enabled?: boolean }) => {
+export const useTripRealtime = (
+  tripId: string,
+  options?: { enabled?: boolean }
+) => {
   const queryClient = useQueryClient();
-  const [tripSubscription, setTripSubscription] = useState<TripSubscription | null>(null);
+  const [tripSubscription, setTripSubscription] =
+    useState<TripSubscription | null>(null);
   const enabled = options?.enabled ?? true;
 
   // Join trip room
@@ -201,7 +207,10 @@ export const useTripRealtime = (tripId: string, options?: { enabled?: boolean })
 /**
  * Hook to handle real-time messages
  */
-export const useTripMessages = (tripId: string, options?: { enabled?: boolean }) => {
+export const useTripMessages = (
+  tripId: string,
+  options?: { enabled?: boolean }
+) => {
   const [messages, setMessages] = useState<any[]>([]);
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
   const enabled = options?.enabled ?? true;
@@ -210,7 +219,7 @@ export const useTripMessages = (tripId: string, options?: { enabled?: boolean })
   useRealtimeEvent(
     'message:new',
     (event) => {
-      setMessages(prev => [...prev, event.data]);
+      setMessages((prev) => [...prev, event.data]);
     },
     tripId,
     { enabled }
@@ -220,7 +229,7 @@ export const useTripMessages = (tripId: string, options?: { enabled?: boolean })
   useRealtimeEvent(
     'typing:start',
     (event) => {
-      setTypingUsers(prev => new Set(prev).add(event.data.userName));
+      setTypingUsers((prev) => new Set(prev).add(event.data.userName));
     },
     tripId,
     { enabled }
@@ -229,7 +238,7 @@ export const useTripMessages = (tripId: string, options?: { enabled?: boolean })
   useRealtimeEvent(
     'typing:stop',
     (event) => {
-      setTypingUsers(prev => {
+      setTypingUsers((prev) => {
         const newSet = new Set(prev);
         newSet.delete(event.data.userName);
         return newSet;
@@ -269,7 +278,9 @@ export const useUserPresence = (tripId?: string) => {
   useRealtimeEvent(
     'user:online',
     (event) => {
-      setOnlineUsers(prev => new Map(prev).set(event.data.userId, event.data));
+      setOnlineUsers((prev) =>
+        new Map(prev).set(event.data.userId, event.data)
+      );
     },
     tripId
   );
@@ -277,7 +288,7 @@ export const useUserPresence = (tripId?: string) => {
   useRealtimeEvent(
     'user:offline',
     (event) => {
-      setOnlineUsers(prev => {
+      setOnlineUsers((prev) => {
         const newMap = new Map(prev);
         newMap.delete(event.data.userId);
         return newMap;

@@ -48,7 +48,9 @@ class WebSocketRealtimeService implements RealtimeService {
   private getWebSocketUrl(): string {
     // Convert HTTP URL to WebSocket URL
     const apiUrl = Env.API_URL;
-    const wsUrl = apiUrl.replace('http://', 'ws://').replace('https://', 'wss://');
+    const wsUrl = apiUrl
+      .replace('http://', 'ws://')
+      .replace('https://', 'wss://');
     return `${wsUrl}/api/v2/realtime`;
   }
 
@@ -62,13 +64,13 @@ class WebSocketRealtimeService implements RealtimeService {
     if (this.status !== status) {
       this.status = status;
       this.log('Status changed:', status);
-      this.connectionHandlers.forEach(handler => handler(status));
+      this.connectionHandlers.forEach((handler) => handler(status));
     }
   }
 
   private handleError(error: Error) {
     this.log('Error:', error);
-    this.errorHandlers.forEach(handler => handler(error));
+    this.errorHandlers.forEach((handler) => handler(error));
   }
 
   private setupEventListeners() {
@@ -78,7 +80,7 @@ class WebSocketRealtimeService implements RealtimeService {
       this.log('Connected to WebSocket');
       this.updateStatus('connected');
       this.reconnectAttempts = 0;
-      
+
       // Authenticate if we have tokens
       this.authenticate();
     };
@@ -86,7 +88,7 @@ class WebSocketRealtimeService implements RealtimeService {
     this.ws.onclose = (event) => {
       this.log('WebSocket closed:', event.code, event.reason);
       this.updateStatus('disconnected');
-      
+
       // Attempt reconnection if not manually closed
       if (event.code !== 1000) {
         this.scheduleReconnect();
@@ -112,7 +114,7 @@ class WebSocketRealtimeService implements RealtimeService {
 
   private handleMessage(message: any) {
     this.log('Received message:', message);
-    
+
     // Handle system messages
     if (message.type === 'system') {
       this.handleSystemMessage(message);
@@ -156,13 +158,14 @@ class WebSocketRealtimeService implements RealtimeService {
 
   private dispatchEvent(event: RealtimeEvent) {
     // Find matching subscriptions
-    const matchingSubscriptions = Array.from(this.subscriptions.values()).filter(
-      (subscription) => {
-        const typeMatches = subscription.eventType === event.type;
-        const tripMatches = !subscription.tripId || subscription.tripId === event.tripId;
-        return typeMatches && tripMatches;
-      }
-    );
+    const matchingSubscriptions = Array.from(
+      this.subscriptions.values()
+    ).filter((subscription) => {
+      const typeMatches = subscription.eventType === event.type;
+      const tripMatches =
+        !subscription.tripId || subscription.tripId === event.tripId;
+      return typeMatches && tripMatches;
+    });
 
     // Call handlers
     matchingSubscriptions.forEach((subscription) => {
@@ -182,15 +185,18 @@ class WebSocketRealtimeService implements RealtimeService {
       return;
     }
 
-    const delay = this.config.reconnectDelay * Math.pow(2, this.reconnectAttempts);
+    const delay =
+      this.config.reconnectDelay * Math.pow(2, this.reconnectAttempts);
     this.reconnectAttempts++;
-    
-    this.log(`Scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
+
+    this.log(
+      `Scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`
+    );
     this.updateStatus('reconnecting');
-    
+
     this.reconnectTimer = setTimeout(() => {
       this.connect();
-    }, delay);
+    }, delay) as any;
   }
 
   private authenticate() {
@@ -240,7 +246,7 @@ class WebSocketRealtimeService implements RealtimeService {
     try {
       this.ws = new WebSocket(this.config.url);
       this.setupEventListeners();
-      
+
       // Wait for connection or timeout
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => {
@@ -268,7 +274,7 @@ class WebSocketRealtimeService implements RealtimeService {
 
   disconnect(): void {
     this.log('Disconnecting...');
-    
+
     // Clear reconnect timer
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
@@ -284,7 +290,7 @@ class WebSocketRealtimeService implements RealtimeService {
     // Clear subscriptions
     this.subscriptions.clear();
     this.tripSubscriptions.clear();
-    
+
     this.updateStatus('disconnected');
   }
 
@@ -292,9 +298,13 @@ class WebSocketRealtimeService implements RealtimeService {
     return this.status;
   }
 
-  on<T>(eventType: RealtimeEventType, handler: EventHandler<T>, tripId?: string): EventSubscription {
+  on<T>(
+    eventType: RealtimeEventType,
+    handler: EventHandler<T>,
+    tripId?: string
+  ): EventSubscription {
     const id = `${eventType}_${tripId || 'global'}_${Date.now()}_${Math.random()}`;
-    
+
     const subscription: EventSubscription = {
       id,
       eventType,
@@ -305,7 +315,7 @@ class WebSocketRealtimeService implements RealtimeService {
 
     this.subscriptions.set(id, subscription);
     this.log('Added subscription:', id, eventType, tripId);
-    
+
     return subscription;
   }
 
@@ -341,7 +351,7 @@ class WebSocketRealtimeService implements RealtimeService {
 
     this.tripSubscriptions.set(tripId, subscription);
     this.log('Joined trip:', tripId);
-    
+
     return subscription;
   }
 
@@ -350,7 +360,7 @@ class WebSocketRealtimeService implements RealtimeService {
     if (!subscription) return;
 
     // Remove all trip-specific subscriptions
-    subscription.subscriptions.forEach(sub => this.off(sub.id));
+    subscription.subscriptions.forEach((sub) => this.off(sub.id));
 
     // Send leave message
     this.send({
@@ -364,7 +374,7 @@ class WebSocketRealtimeService implements RealtimeService {
 
   onConnectionChange(handler: ConnectionHandler): () => void {
     this.connectionHandlers.push(handler);
-    
+
     // Return unsubscribe function
     return () => {
       const index = this.connectionHandlers.indexOf(handler);
@@ -376,7 +386,7 @@ class WebSocketRealtimeService implements RealtimeService {
 
   onError(handler: ErrorHandler): () => void {
     this.errorHandlers.push(handler);
-    
+
     // Return unsubscribe function
     return () => {
       const index = this.errorHandlers.indexOf(handler);

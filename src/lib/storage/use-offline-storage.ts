@@ -3,29 +3,42 @@
  * React integration for offline-first storage with automatic sync
  */
 
-import { useCallback, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
 
-import { useAuth } from '@/lib/auth';
 import { tripKeys } from '@/api/trips';
+import { useAuth } from '@/lib/auth';
 
 import offlineStorage from './offline-storage';
-import type { ConflictEntry, PendingChange, StorageStats, StoredTrip, StoredTripsList, StoredUserProfile, SyncStatus } from './types';
+import type {
+  ConflictEntry,
+  PendingChange,
+  StorageStats,
+  StoredTrip,
+  StoredTripsList,
+  StoredUserProfile,
+  SyncStatus,
+} from './types';
 
 /**
  * Hook to manage offline storage for a specific entity
  */
 export const useOfflineEntity = <T>(key: string, initialData?: T) => {
-  const [data, setData] = useState<T | null>(() => 
-    offlineStorage.getData<T>(key) ?? initialData ?? null
+  const [data, setData] = useState<T | null>(
+    () => offlineStorage.getData<T>(key) ?? initialData ?? null
   );
-  const [metadata, setMetadata] = useState(() => offlineStorage.getMetadata(key));
+  const [metadata, setMetadata] = useState(() =>
+    offlineStorage.getMetadata(key)
+  );
 
-  const store = useCallback((newData: T, syncStatus: SyncStatus = 'pending') => {
-    offlineStorage.set(key, newData, { syncStatus });
-    setData(newData);
-    setMetadata(offlineStorage.getMetadata(key));
-  }, [key]);
+  const store = useCallback(
+    (newData: T, syncStatus: SyncStatus = 'pending') => {
+      offlineStorage.set(key, newData, { syncStatus });
+      setData(newData);
+      setMetadata(offlineStorage.getMetadata(key));
+    },
+    [key]
+  );
 
   const remove = useCallback(() => {
     offlineStorage.delete(key);
@@ -40,10 +53,13 @@ export const useOfflineEntity = <T>(key: string, initialData?: T) => {
     setMetadata(storedMetadata);
   }, [key]);
 
-  const updateSyncStatus = useCallback((status: SyncStatus, lastSynced?: string) => {
-    offlineStorage.updateSyncStatus(key, status, lastSynced);
-    setMetadata(offlineStorage.getMetadata(key));
-  }, [key]);
+  const updateSyncStatus = useCallback(
+    (status: SyncStatus, lastSynced?: string) => {
+      offlineStorage.updateSyncStatus(key, status, lastSynced);
+      setMetadata(offlineStorage.getMetadata(key));
+    },
+    [key]
+  );
 
   return {
     data,
@@ -72,12 +88,15 @@ export const useOfflineTrip = (tripId: string) => {
     updateSyncStatus,
   } = useOfflineEntity<StoredTrip>(key);
 
-  const storeTrip = useCallback((tripData: any, syncStatus: SyncStatus = 'pending') => {
-    offlineStorage.storeTrip(tripId, tripData, { syncStatus });
-    // Refresh local state
-    const refreshedData = offlineStorage.getData<StoredTrip>(key);
-    store(refreshedData as StoredTrip, syncStatus);
-  }, [tripId, key, store]);
+  const storeTrip = useCallback(
+    (tripData: any, syncStatus: SyncStatus = 'pending') => {
+      offlineStorage.storeTrip(tripId, tripData, { syncStatus });
+      // Refresh local state
+      const refreshedData = offlineStorage.getData<StoredTrip>(key);
+      store(refreshedData as StoredTrip, syncStatus);
+    },
+    [tripId, key, store]
+  );
 
   return {
     trip: trip?.data,
@@ -109,17 +128,21 @@ export const useOfflineTripsList = () => {
     updateSyncStatus,
   } = useOfflineEntity<StoredTripsList>('trips:list');
 
-  const storeTripsList = useCallback((
-    trips: any[],
-    filters?: Record<string, any>,
-    pagination?: any,
-    syncStatus: SyncStatus = 'pending'
-  ) => {
-    offlineStorage.storeTripsList(trips, filters, pagination);
-    // Update local state
-    const refreshedData = offlineStorage.getData<StoredTripsList>('trips:list');
-    store(refreshedData as StoredTripsList, syncStatus);
-  }, [store]);
+  const storeTripsList = useCallback(
+    (
+      trips: any[],
+      filters?: Record<string, any>,
+      pagination?: any,
+      syncStatus: SyncStatus = 'pending'
+    ) => {
+      offlineStorage.storeTripsList(trips, filters, pagination);
+      // Update local state
+      const refreshedData =
+        offlineStorage.getData<StoredTripsList>('trips:list');
+      store(refreshedData as StoredTripsList, syncStatus);
+    },
+    [store]
+  );
 
   return {
     trips: tripsList?.trips || [],
@@ -148,15 +171,16 @@ export const useOfflineUserProfile = () => {
     updateSyncStatus,
   } = useOfflineEntity<StoredUserProfile>('user:profile');
 
-  const storeUserProfile = useCallback((
-    userData: any,
-    syncStatus: SyncStatus = 'pending'
-  ) => {
-    offlineStorage.storeUserProfile(userData, { syncStatus });
-    // Update local state
-    const refreshedData = offlineStorage.getData<StoredUserProfile>('user:profile');
-    store(refreshedData as StoredUserProfile, syncStatus);
-  }, [store]);
+  const storeUserProfile = useCallback(
+    (userData: any, syncStatus: SyncStatus = 'pending') => {
+      offlineStorage.storeUserProfile(userData, { syncStatus });
+      // Update local state
+      const refreshedData =
+        offlineStorage.getData<StoredUserProfile>('user:profile');
+      store(refreshedData as StoredUserProfile, syncStatus);
+    },
+    [store]
+  );
 
   return {
     user: userProfile?.data,
@@ -184,21 +208,33 @@ export const usePendingChanges = () => {
     setPendingChanges(changes);
   }, []);
 
-  const addPendingChange = useCallback((
-    entityType: string,
-    entityId: string,
-    operation: 'create' | 'update' | 'delete',
-    data: any,
-    metadata: Record<string, any> = {}
-  ) => {
-    offlineStorage.addPendingChange(entityType, entityId, operation, data, metadata);
-    refreshPendingChanges();
-  }, [refreshPendingChanges]);
+  const addPendingChange = useCallback(
+    (
+      entityType: string,
+      entityId: string,
+      operation: 'create' | 'update' | 'delete',
+      data: any,
+      metadata: Record<string, any> = {}
+    ) => {
+      offlineStorage.addPendingChange(
+        entityType,
+        entityId,
+        operation,
+        data,
+        metadata
+      );
+      refreshPendingChanges();
+    },
+    [refreshPendingChanges]
+  );
 
-  const removePendingChange = useCallback((changeId: string) => {
-    offlineStorage.removePendingChange(changeId);
-    refreshPendingChanges();
-  }, [refreshPendingChanges]);
+  const removePendingChange = useCallback(
+    (changeId: string) => {
+      offlineStorage.removePendingChange(changeId);
+      refreshPendingChanges();
+    },
+    [refreshPendingChanges]
+  );
 
   useEffect(() => {
     refreshPendingChanges();
@@ -224,14 +260,17 @@ export const useConflictResolution = () => {
     setConflicts(conflictList);
   }, []);
 
-  const resolveConflict = useCallback((
-    conflictId: string,
-    resolution: 'local' | 'remote' | 'merge',
-    mergedData?: any
-  ) => {
-    offlineStorage.resolveConflict(conflictId, resolution, mergedData);
-    refreshConflicts();
-  }, [refreshConflicts]);
+  const resolveConflict = useCallback(
+    (
+      conflictId: string,
+      resolution: 'local' | 'remote' | 'merge',
+      mergedData?: any
+    ) => {
+      offlineStorage.resolveConflict(conflictId, resolution, mergedData);
+      refreshConflicts();
+    },
+    [refreshConflicts]
+  );
 
   useEffect(() => {
     refreshConflicts();
@@ -250,7 +289,9 @@ export const useConflictResolution = () => {
  * Hook to get storage statistics and manage cleanup
  */
 export const useStorageManagement = () => {
-  const [stats, setStats] = useState<StorageStats>(() => offlineStorage.getStats());
+  const [stats, setStats] = useState<StorageStats>(() =>
+    offlineStorage.getStats()
+  );
 
   const refreshStats = useCallback(() => {
     const newStats = offlineStorage.getStats();
@@ -288,43 +329,43 @@ export const useOfflineQuerySync = () => {
   const queryClient = useQueryClient();
   const { status: authStatus } = useAuth();
 
-  const syncTripToQuery = useCallback((tripId: string) => {
-    const offlineTrip = offlineStorage.getTrip(tripId);
-    if (offlineTrip && offlineTrip.metadata.syncStatus === 'synced') {
-      // Update query cache with offline data
-      queryClient.setQueryData(
-        tripKeys.detail(tripId),
-        {
+  const syncTripToQuery = useCallback(
+    (tripId: string) => {
+      const offlineTrip = offlineStorage.getTrip(tripId);
+      if (offlineTrip && offlineTrip.metadata.syncStatus === 'synced') {
+        // Update query cache with offline data
+        queryClient.setQueryData(tripKeys.detail(tripId), {
           success: true,
           data: { trip: offlineTrip.data },
-        }
-      );
-    }
-  }, [queryClient]);
+        });
+      }
+    },
+    [queryClient]
+  );
 
   const syncTripsListToQuery = useCallback(() => {
     const offlineTripsList = offlineStorage.getTripsList();
     if (offlineTripsList && offlineTripsList.metadata.syncStatus === 'synced') {
       // Update query cache with offline data
-      queryClient.setQueryData(
-        tripKeys.list(),
-        {
-          success: true,
-          data: {
-            trips: offlineTripsList.trips,
-            total: offlineTripsList.pagination.total,
-            hasMore: offlineTripsList.pagination.hasMore,
-          },
-        }
-      );
+      queryClient.setQueryData(tripKeys.list(), {
+        success: true,
+        data: {
+          trips: offlineTripsList.trips,
+          total: offlineTripsList.pagination.total,
+          hasMore: offlineTripsList.pagination.hasMore,
+        },
+      });
     }
   }, [queryClient]);
 
-  const syncQueryToOffline = useCallback((queryKey: readonly unknown[], data: any) => {
-    // Store query data offline
-    const key = queryKey.join(':');
-    offlineStorage.set(key, data, { syncStatus: 'synced' });
-  }, []);
+  const syncQueryToOffline = useCallback(
+    (queryKey: readonly unknown[], data: any) => {
+      // Store query data offline
+      const key = queryKey.join(':');
+      offlineStorage.set(key, data, { syncStatus: 'synced' });
+    },
+    []
+  );
 
   return {
     syncTripToQuery,

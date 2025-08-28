@@ -5,7 +5,12 @@
 
 import { showMessage } from 'react-native-flash-message';
 
-import type { ApiClientError, AuthenticationError, NetworkError, ValidationError } from '@/api/common/types';
+import {
+  ApiClientError,
+  AuthenticationError,
+  NetworkError,
+  ValidationError,
+} from '@/api/common/types';
 
 import type {
   AppError,
@@ -13,7 +18,6 @@ import type {
   ErrorContext,
   ErrorDisplayOptions,
   ErrorHandlerConfig,
-  ErrorRecoveryStrategy,
   ErrorReport,
   ErrorSeverity,
   NetworkErrorDetails,
@@ -49,9 +53,9 @@ class ErrorHandlerService {
   addBreadcrumb(message: string, category?: string) {
     const timestamp = new Date().toISOString();
     const breadcrumb = `[${timestamp}] ${category ? `[${category}] ` : ''}${message}`;
-    
+
     this.breadcrumbs.push(breadcrumb);
-    
+
     // Keep only recent breadcrumbs
     if (this.breadcrumbs.length > this.maxBreadcrumbs) {
       this.breadcrumbs = this.breadcrumbs.slice(-this.maxBreadcrumbs);
@@ -65,9 +69,9 @@ class ErrorHandlerService {
     options?: Partial<ErrorDisplayOptions>
   ): AppError {
     const appError = this.classifyError(error, context);
-    
+
     this.log('Handling error:', appError);
-    
+
     // Add to breadcrumbs
     this.addBreadcrumb(
       `Error: ${appError.code} - ${appError.message}`,
@@ -76,7 +80,7 @@ class ErrorHandlerService {
 
     // Create error report
     const errorReport = this.createErrorReport(appError, context || {});
-    
+
     // Queue for reporting (if enabled)
     if (this.config.reportToService) {
       this.errorQueue.push(errorReport);
@@ -91,7 +95,10 @@ class ErrorHandlerService {
   }
 
   // Classify and enhance errors
-  private classifyError(error: Error | AppError, context?: ErrorContext): AppError {
+  private classifyError(
+    error: Error | AppError,
+    context?: ErrorContext
+  ): AppError {
     // If already an AppError, return as-is
     if ('category' in error && 'severity' in error) {
       return error as AppError;
@@ -112,7 +119,10 @@ class ErrorHandlerService {
         retryable: true,
         context,
       };
-    } else if (error instanceof AuthenticationError || error.name === 'AuthenticationError') {
+    } else if (
+      error instanceof AuthenticationError ||
+      error.name === 'AuthenticationError'
+    ) {
       appError = {
         ...error,
         code: 'AUTHENTICATION_ERROR',
@@ -123,7 +133,10 @@ class ErrorHandlerService {
         retryable: false,
         context,
       };
-    } else if (error instanceof ValidationError || error.name === 'ValidationError') {
+    } else if (
+      error instanceof ValidationError ||
+      error.name === 'ValidationError'
+    ) {
       appError = {
         ...error,
         code: 'VALIDATION_ERROR',
@@ -134,7 +147,10 @@ class ErrorHandlerService {
         retryable: false,
         context,
       };
-    } else if (error instanceof ApiClientError || error.name === 'ApiClientError') {
+    } else if (
+      error instanceof ApiClientError ||
+      error.name === 'ApiClientError'
+    ) {
       const apiError = error as ApiClientError;
       appError = {
         ...error,
@@ -166,7 +182,7 @@ class ErrorHandlerService {
 
   private categorizeApiError(status?: number): ErrorCategory {
     if (!status) return 'unknown';
-    
+
     if (status === 401) return 'authentication';
     if (status === 403) return 'authorization';
     if (status >= 400 && status < 500) return 'client';
@@ -176,7 +192,7 @@ class ErrorHandlerService {
 
   private getSeverityFromStatus(status?: number): ErrorSeverity {
     if (!status) return 'medium';
-    
+
     if (status === 401 || status === 403) return 'high';
     if (status >= 500) return 'high';
     if (status === 404) return 'low';
@@ -184,7 +200,10 @@ class ErrorHandlerService {
     return 'low';
   }
 
-  private createErrorReport(error: AppError, context: ErrorContext): ErrorReport {
+  private createErrorReport(
+    error: AppError,
+    context: ErrorContext
+  ): ErrorReport {
     return {
       error,
       context,
@@ -196,21 +215,28 @@ class ErrorHandlerService {
   }
 
   // Display error to user
-  private displayError(error: AppError, options?: Partial<ErrorDisplayOptions>) {
+  private displayError(
+    error: AppError,
+    options?: Partial<ErrorDisplayOptions>
+  ) {
     const displayOptions = this.getDisplayOptions(error, options);
-    
+
     showMessage({
       message: displayOptions.title || 'Error',
       description: displayOptions.message || error.message,
       type: this.getMessageType(displayOptions.severity || error.severity),
-      duration: displayOptions.duration || this.getDurationBySeverity(error.severity),
+      duration:
+        displayOptions.duration || this.getDurationBySeverity(error.severity),
       floating: true,
       autoHide: !displayOptions.persistent,
       icon: displayOptions.icon || this.getIconBySeverity(error.severity),
     });
   }
 
-  private getDisplayOptions(error: AppError, options?: Partial<ErrorDisplayOptions>): ErrorDisplayOptions {
+  private getDisplayOptions(
+    error: AppError,
+    options?: Partial<ErrorDisplayOptions>
+  ): ErrorDisplayOptions {
     const defaultOptions = this.getDefaultDisplayOptions(error);
     return { ...defaultOptions, ...options };
   }
@@ -223,57 +249,59 @@ class ErrorHandlerService {
           message: 'Please check your internet connection and try again.',
           severity: 'medium',
         };
-      
+
       case 'authentication':
         return {
           title: 'Authentication Required',
           message: 'Please sign in to continue.',
           severity: 'high',
         };
-      
+
       case 'authorization':
         return {
           title: 'Access Denied',
-          message: 'You don\'t have permission to perform this action.',
+          message: "You don't have permission to perform this action.",
           severity: 'high',
         };
-      
+
       case 'validation':
         return {
           title: 'Invalid Input',
           message: error.message || 'Please check your input and try again.',
           severity: 'low',
         };
-      
+
       case 'server':
         return {
           title: 'Server Error',
           message: 'Something went wrong on our end. Please try again later.',
           severity: 'high',
         };
-      
+
       case 'offline':
         return {
-          title: 'You\'re Offline',
-          message: 'Your changes will be saved and synced when you\'re back online.',
+          title: "You're Offline",
+          message:
+            "Your changes will be saved and synced when you're back online.",
           severity: 'medium',
         };
-      
+
       case 'sync':
         return {
           title: 'Sync Problem',
-          message: 'We couldn\'t sync your data. We\'ll try again automatically.',
+          message: "We couldn't sync your data. We'll try again automatically.",
           severity: 'medium',
         };
-      
+
       case 'conflict':
         return {
           title: 'Data Conflict',
-          message: 'Your data conflicts with recent changes. Please review and merge.',
+          message:
+            'Your data conflicts with recent changes. Please review and merge.',
           severity: 'high',
           persistent: true,
         };
-      
+
       default:
         return {
           title: 'Something Went Wrong',
@@ -283,33 +311,50 @@ class ErrorHandlerService {
     }
   }
 
-  private getMessageType(severity: ErrorSeverity): 'success' | 'info' | 'warning' | 'danger' {
+  private getMessageType(
+    severity: ErrorSeverity
+  ): 'success' | 'info' | 'warning' | 'danger' {
     switch (severity) {
-      case 'low': return 'info';
-      case 'medium': return 'warning';
-      case 'high': 
-      case 'critical': return 'danger';
-      default: return 'warning';
+      case 'low':
+        return 'info';
+      case 'medium':
+        return 'warning';
+      case 'high':
+      case 'critical':
+        return 'danger';
+      default:
+        return 'warning';
     }
   }
 
   private getDurationBySeverity(severity: ErrorSeverity): number {
     switch (severity) {
-      case 'low': return 3000;
-      case 'medium': return 5000;
-      case 'high': return 7000;
-      case 'critical': return 10000;
-      default: return 5000;
+      case 'low':
+        return 3000;
+      case 'medium':
+        return 5000;
+      case 'high':
+        return 7000;
+      case 'critical':
+        return 10000;
+      default:
+        return 5000;
     }
   }
 
-  private getIconBySeverity(severity: ErrorSeverity): 'auto' | 'success' | 'info' | 'warning' | 'danger' {
+  private getIconBySeverity(
+    severity: ErrorSeverity
+  ): 'auto' | 'success' | 'info' | 'warning' | 'danger' {
     switch (severity) {
-      case 'low': return 'info';
-      case 'medium': return 'warning';
+      case 'low':
+        return 'info';
+      case 'medium':
+        return 'warning';
       case 'high':
-      case 'critical': return 'danger';
-      default: return 'auto';
+      case 'critical':
+        return 'danger';
+      default:
+        return 'auto';
     }
   }
 
@@ -328,7 +373,10 @@ class ErrorHandlerService {
     };
   }
 
-  createValidationError(message: string, details?: ValidationErrorDetails): AppError {
+  createValidationError(
+    message: string,
+    details?: ValidationErrorDetails
+  ): AppError {
     return {
       name: 'ValidationError',
       message,
@@ -374,10 +422,11 @@ class ErrorHandlerService {
   shouldRetry(error: AppError, attemptCount: number): boolean {
     if (!error.retryable) return false;
     if (attemptCount >= this.config.maxRetries) return false;
-    
+
     // Don't retry client errors (4xx)
-    if (error.category === 'client' || error.category === 'validation') return false;
-    
+    if (error.category === 'client' || error.category === 'validation')
+      return false;
+
     return true;
   }
 
@@ -388,7 +437,7 @@ class ErrorHandlerService {
   // Error reporting
   async reportErrors(): Promise<void> {
     if (this.errorQueue.length === 0) return;
-    
+
     try {
       // TODO: Implement error reporting service
       // await errorReportingService.report(this.errorQueue);
@@ -418,7 +467,7 @@ class ErrorHandlerService {
       unknown: 0,
     };
 
-    this.errorQueue.forEach(report => {
+    this.errorQueue.forEach((report) => {
       categoryCounts[report.error.category]++;
     });
 

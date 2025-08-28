@@ -7,28 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		004FDE5F4043434AAD02C493 /* Inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2D0A597CFC24A099A937085 /* Inter.ttf */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		1B485697BEA03219996C99EE /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6349EB3C44037D273387466F /* ExpoModulesProvider.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		A3BEED2D13A042ECB39265F8 /* Inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 36817EE852384151B140E47F /* Inter.ttf */; };
-		B0F75A453F8F7B9801BB5BF5 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58ACE9DFBE943B553F43F501 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		DA32C10FCC6C99CA779509EF /* libPods-tripsyncmobilev2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 736D93E837436D0AD1CC8B89 /* libPods-tripsyncmobilev2.a */; };
-		DF923918ED8C24C99584A9CC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 297403670B25BB1FC2931872 /* PrivacyInfo.xcprivacy */; };
+		CF1970F8370104A07986FA80 /* libPods-tripsyncmobilev2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 608A8C94C3C0C9A19557C5D2 /* libPods-tripsyncmobilev2.a */; };
+		DFB2D1E8E776657AACCC3E0F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 34E84BD96459226F76EA9FAC /* PrivacyInfo.xcprivacy */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E493644799296FDCB68427D /* Pods-tripsyncmobilev2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tripsyncmobilev2.release.xcconfig"; path = "Target Support Files/Pods-tripsyncmobilev2/Pods-tripsyncmobilev2.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* tripsyncmobilev2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tripsyncmobilev2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = tripsyncmobilev2/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = tripsyncmobilev2/Info.plist; sourceTree = "<group>"; };
-		297403670B25BB1FC2931872 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = tripsyncmobilev2/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		36817EE852384151B140E47F /* Inter.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = Inter.ttf; path = ../assets/fonts/Inter.ttf; sourceTree = "<group>"; };
-		58ACE9DFBE943B553F43F501 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-tripsyncmobilev2/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		736D93E837436D0AD1CC8B89 /* libPods-tripsyncmobilev2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-tripsyncmobilev2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		34E84BD96459226F76EA9FAC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = tripsyncmobilev2/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		608A8C94C3C0C9A19557C5D2 /* libPods-tripsyncmobilev2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-tripsyncmobilev2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6349EB3C44037D273387466F /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-tripsyncmobilev2/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = tripsyncmobilev2/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B57C0D4B96001D16134489EA /* Pods-tripsyncmobilev2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tripsyncmobilev2.release.xcconfig"; path = "Target Support Files/Pods-tripsyncmobilev2/Pods-tripsyncmobilev2.release.xcconfig"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		D633DA4DBCEBCE35FE5001E2 /* Pods-tripsyncmobilev2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tripsyncmobilev2.debug.xcconfig"; path = "Target Support Files/Pods-tripsyncmobilev2/Pods-tripsyncmobilev2.debug.xcconfig"; sourceTree = "<group>"; };
+		BD4DA1F421186EAB944FCE8B /* Pods-tripsyncmobilev2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tripsyncmobilev2.debug.xcconfig"; path = "Target Support Files/Pods-tripsyncmobilev2/Pods-tripsyncmobilev2.debug.xcconfig"; sourceTree = "<group>"; };
+		E2D0A597CFC24A099A937085 /* Inter.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = Inter.ttf; path = ../assets/fonts/Inter.ttf; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = tripsyncmobilev2/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* tripsyncmobilev2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "tripsyncmobilev2-Bridging-Header.h"; path = "tripsyncmobilev2/tripsyncmobilev2-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -39,7 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA32C10FCC6C99CA779509EF /* libPods-tripsyncmobilev2.a in Frameworks */,
+				CF1970F8370104A07986FA80 /* libPods-tripsyncmobilev2.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,36 +55,45 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				297403670B25BB1FC2931872 /* PrivacyInfo.xcprivacy */,
+				34E84BD96459226F76EA9FAC /* PrivacyInfo.xcprivacy */,
 			);
 			name = tripsyncmobilev2;
 			sourceTree = "<group>";
 		};
-		1FA1917BB7E201699F159063 /* Pods */ = {
+		16131E4B2C0943908E136BBB /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				D633DA4DBCEBCE35FE5001E2 /* Pods-tripsyncmobilev2.debug.xcconfig */,
-				B57C0D4B96001D16134489EA /* Pods-tripsyncmobilev2.release.xcconfig */,
+				E2D0A597CFC24A099A937085 /* Inter.ttf */,
 			);
-			name = Pods;
-			path = Pods;
+			name = Resources;
+			path = "";
+			sourceTree = "<group>";
+		};
+		2783C94EC505F37C63F7BD60 /* tripsyncmobilev2 */ = {
+			isa = PBXGroup;
+			children = (
+				6349EB3C44037D273387466F /* ExpoModulesProvider.swift */,
+			);
+			name = tripsyncmobilev2;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				736D93E837436D0AD1CC8B89 /* libPods-tripsyncmobilev2.a */,
+				608A8C94C3C0C9A19557C5D2 /* libPods-tripsyncmobilev2.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4D73C5CDE2A109DD92CEE7C8 /* ExpoModulesProviders */ = {
+		6FD8413AC57CEB8626EC7EA6 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				AB0FDADA7953EF85ED86326A /* tripsyncmobilev2 */,
+				BD4DA1F421186EAB944FCE8B /* Pods-tripsyncmobilev2.debug.xcconfig */,
+				0E493644799296FDCB68427D /* Pods-tripsyncmobilev2.release.xcconfig */,
 			);
-			name = ExpoModulesProviders;
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -101,9 +110,9 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				D5098512F2E54515B3808727 /* Resources */,
-				1FA1917BB7E201699F159063 /* Pods */,
-				4D73C5CDE2A109DD92CEE7C8 /* ExpoModulesProviders */,
+				16131E4B2C0943908E136BBB /* Resources */,
+				6FD8413AC57CEB8626EC7EA6 /* Pods */,
+				8EBCF07F184AC1F8C22D72EC /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -118,12 +127,12 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		AB0FDADA7953EF85ED86326A /* tripsyncmobilev2 */ = {
+		8EBCF07F184AC1F8C22D72EC /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				58ACE9DFBE943B553F43F501 /* ExpoModulesProvider.swift */,
+				2783C94EC505F37C63F7BD60 /* tripsyncmobilev2 */,
 			);
-			name = tripsyncmobilev2;
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -135,15 +144,6 @@
 			path = tripsyncmobilev2/Supporting;
 			sourceTree = "<group>";
 		};
-		D5098512F2E54515B3808727 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				36817EE852384151B140E47F /* Inter.ttf */,
-			);
-			name = Resources;
-			path = "";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -152,13 +152,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "tripsyncmobilev2" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				993891AB19B17F7DE1BDC077 /* [Expo] Configure project */,
+				6CC25783A3DABE71B22F5D9C /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				C648B7C3E4D264A25A6475D4 /* [CP] Embed Pods Frameworks */,
+				23470476249DF5FE0E334D77 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -208,8 +208,8 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				A3BEED2D13A042ECB39265F8 /* Inter.ttf in Resources */,
-				DF923918ED8C24C99584A9CC /* PrivacyInfo.xcprivacy in Resources */,
+				004FDE5F4043434AAD02C493 /* Inter.ttf in Resources */,
+				DFB2D1E8E776657AACCC3E0F /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,6 +252,43 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		23470476249DF5FE0E334D77 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-tripsyncmobilev2/Pods-tripsyncmobilev2-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-tripsyncmobilev2/Pods-tripsyncmobilev2-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6CC25783A3DABE71B22F5D9C /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-tripsyncmobilev2/expo-configure-project.sh\"\n";
 		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -299,43 +336,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-tripsyncmobilev2/Pods-tripsyncmobilev2-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		993891AB19B17F7DE1BDC077 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-tripsyncmobilev2/expo-configure-project.sh\"\n";
-		};
-		C648B7C3E4D264A25A6475D4 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-tripsyncmobilev2/Pods-tripsyncmobilev2-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-tripsyncmobilev2/Pods-tripsyncmobilev2-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -344,7 +344,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				B0F75A453F8F7B9801BB5BF5 /* ExpoModulesProvider.swift in Sources */,
+				1B485697BEA03219996C99EE /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,11 +353,10 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D633DA4DBCEBCE35FE5001E2 /* Pods-tripsyncmobilev2.debug.xcconfig */;
+			baseConfigurationReference = BD4DA1F421186EAB944FCE8B /* Pods-tripsyncmobilev2.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = tripsyncmobilev2/tripsyncmobilev2.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -378,7 +377,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.trip-sync-mobile-v2.development";
-				PRODUCT_NAME = "tripsyncmobilev2";
+				PRODUCT_NAME = tripsyncmobilev2;
 				SWIFT_OBJC_BRIDGING_HEADER = "tripsyncmobilev2/tripsyncmobilev2-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -389,11 +388,10 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B57C0D4B96001D16134489EA /* Pods-tripsyncmobilev2.release.xcconfig */;
+			baseConfigurationReference = 0E493644799296FDCB68427D /* Pods-tripsyncmobilev2.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = tripsyncmobilev2/tripsyncmobilev2.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = tripsyncmobilev2/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -409,7 +407,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.trip-sync-mobile-v2.development";
-				PRODUCT_NAME = "tripsyncmobilev2";
+				PRODUCT_NAME = tripsyncmobilev2;
 				SWIFT_OBJC_BRIDGING_HEADER = "tripsyncmobilev2/tripsyncmobilev2-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

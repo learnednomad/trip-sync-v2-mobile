@@ -7,8 +7,8 @@ import React, { createContext, useContext, useEffect } from 'react';
 
 import { useAuth } from '@/lib/auth';
 
-import { useRealtimeConnection } from './use-realtime';
 import type { ConnectionStatus } from './types';
+import { useRealtimeConnection } from './use-realtime';
 
 interface RealtimeContextType {
   status: ConnectionStatus;
@@ -20,12 +20,16 @@ interface RealtimeContextType {
   disconnect: () => void;
 }
 
-const RealtimeContext = createContext<RealtimeContextType | undefined>(undefined);
+const RealtimeContext = createContext<RealtimeContextType | undefined>(
+  undefined
+);
 
 export const useRealtimeContext = () => {
   const context = useContext(RealtimeContext);
   if (!context) {
-    throw new Error('useRealtimeContext must be used within a RealtimeProvider');
+    throw new Error(
+      'useRealtimeContext must be used within a RealtimeProvider'
+    );
   }
   return context;
 };
@@ -38,7 +42,9 @@ interface RealtimeProviderProps {
  * Real-time Provider Component
  * Manages global WebSocket connection and provides context to children
  */
-export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({ children }) => {
+export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({
+  children,
+}) => {
   const { status: authStatus } = useAuth();
   const realtimeConnection = useRealtimeConnection();
 
@@ -54,7 +60,10 @@ export const RealtimeProvider: React.FC<RealtimeProviderProps> = ({ children }) 
 
   // Auto-reconnect on authentication changes
   useEffect(() => {
-    if (authStatus === 'signIn' && realtimeConnection.status === 'disconnected') {
+    if (
+      authStatus === 'signIn' &&
+      realtimeConnection.status === 'disconnected'
+    ) {
       realtimeConnection.connect().catch((error) => {
         console.error('[RealtimeProvider] Failed to connect:', error);
       });

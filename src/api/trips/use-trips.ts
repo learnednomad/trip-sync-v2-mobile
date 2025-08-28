@@ -21,7 +21,8 @@ export const tripKeys = {
   list: (params?: TripListParams) => [...tripKeys.lists(), params] as const,
   details: () => [...tripKeys.all, 'detail'] as const,
   detail: (id: string) => [...tripKeys.details(), id] as const,
-  participants: (tripId: string) => [...tripKeys.detail(tripId), 'participants'] as const,
+  participants: (tripId: string) =>
+    [...tripKeys.detail(tripId), 'participants'] as const,
 };
 
 /**
@@ -32,7 +33,7 @@ export const useTrips = (params?: TripListParams) => {
     queryKey: tripKeys.list(params),
     queryFn: () => tripsApi.getTripList(params),
     staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 30,   // 30 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
   });
 };
 
@@ -57,7 +58,7 @@ export const useTrip = (tripId: string, options?: { enabled?: boolean }) => {
     queryFn: () => tripsApi.getTripById(tripId),
     enabled: options?.enabled ?? !!tripId,
     staleTime: 1000 * 60 * 2, // 2 minutes for details
-    gcTime: 1000 * 60 * 10,   // 10 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
   });
 };
 
@@ -73,7 +74,7 @@ export const useCreateTrip = () => {
       if (response.success && response.data) {
         // Invalidate trip lists
         queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
-        
+
         // Cache the new trip
         queryClient.setQueryData(
           tripKeys.detail(response.data.trip.id),
@@ -98,11 +99,8 @@ export const useUpdateTrip = (tripId: string) => {
     onSuccess: (response) => {
       if (response.success && response.data) {
         // Update cached trip details
-        queryClient.setQueryData(
-          tripKeys.detail(tripId),
-          response
-        );
-        
+        queryClient.setQueryData(tripKeys.detail(tripId), response);
+
         // Invalidate trip lists to ensure consistency
         queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
       }
@@ -125,7 +123,7 @@ export const useDeleteTrip = () => {
       if (response.success) {
         // Remove from cache
         queryClient.removeQueries({ queryKey: tripKeys.detail(tripId) });
-        
+
         // Invalidate lists to update UI
         queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
       }
@@ -143,15 +141,17 @@ export const useInviteParticipants = (tripId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: InviteParticipantRequest) => 
+    mutationFn: (data: InviteParticipantRequest) =>
       tripsApi.inviteParticipants(tripId, data),
     onSuccess: (response) => {
       if (response.success) {
         // Invalidate trip details to refresh participant list
         queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) });
-        
+
         // Invalidate participants cache
-        queryClient.invalidateQueries({ queryKey: tripKeys.participants(tripId) });
+        queryClient.invalidateQueries({
+          queryKey: tripKeys.participants(tripId),
+        });
       }
     },
     onError: (error) => {
@@ -167,15 +167,22 @@ export const useUpdateParticipant = (tripId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, data }: { userId: string; data: UpdateParticipantRequest }) =>
-      tripsApi.updateParticipant(tripId, userId, data),
+    mutationFn: ({
+      userId,
+      data,
+    }: {
+      userId: string;
+      data: UpdateParticipantRequest;
+    }) => tripsApi.updateParticipant(tripId, userId, data),
     onSuccess: (response) => {
       if (response.success) {
         // Invalidate trip details to refresh participant list
         queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) });
-        
+
         // Invalidate participants cache
-        queryClient.invalidateQueries({ queryKey: tripKeys.participants(tripId) });
+        queryClient.invalidateQueries({
+          queryKey: tripKeys.participants(tripId),
+        });
       }
     },
     onError: (error) => {
@@ -196,9 +203,11 @@ export const useRemoveParticipant = (tripId: string) => {
       if (response.success) {
         // Invalidate trip details to refresh participant list
         queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) });
-        
+
         // Invalidate participants cache
-        queryClient.invalidateQueries({ queryKey: tripKeys.participants(tripId) });
+        queryClient.invalidateQueries({
+          queryKey: tripKeys.participants(tripId),
+        });
       }
     },
     onError: (error) => {
@@ -214,20 +223,17 @@ export const useOptimisticTripUpdate = (tripId: string) => {
   const queryClient = useQueryClient();
 
   const updateTripOptimistically = (updater: (currentTrip: any) => any) => {
-    queryClient.setQueryData(
-      tripKeys.detail(tripId),
-      (old: any) => {
-        if (!old?.data?.trip) return old;
-        
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            trip: updater(old.data.trip),
-          },
-        };
-      }
-    );
+    queryClient.setQueryData(tripKeys.detail(tripId), (old: any) => {
+      if (!old?.data?.trip) return old;
+
+      return {
+        ...old,
+        data: {
+          ...old.data,
+          trip: updater(old.data.trip),
+        },
+      };
+    });
   };
 
   return { updateTripOptimistically };

@@ -3,8 +3,8 @@
  * React integration for error handling and recovery
  */
 
-import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
 
 import errorHandler from './error-handler';
 import type {
@@ -19,13 +19,16 @@ import type {
  * Hook to handle errors with automatic classification and display
  */
 export const useErrorHandler = () => {
-  const handleError = useCallback((
-    error: Error | AppError,
-    context?: ErrorContext,
-    options?: Partial<ErrorDisplayOptions>
-  ): AppError => {
-    return errorHandler.handleError(error, context, options);
-  }, []);
+  const handleError = useCallback(
+    (
+      error: Error | AppError,
+      context?: ErrorContext,
+      options?: Partial<ErrorDisplayOptions>
+    ): AppError => {
+      return errorHandler.handleError(error, context, options);
+    },
+    []
+  );
 
   const addBreadcrumb = useCallback((message: string, category?: string) => {
     errorHandler.addBreadcrumb(message, category);
@@ -50,9 +53,12 @@ export const useErrorFactory = () => {
     return errorHandler.createNetworkError(message, details);
   }, []);
 
-  const createValidationError = useCallback((message: string, details?: any) => {
-    return errorHandler.createValidationError(message, details);
-  }, []);
+  const createValidationError = useCallback(
+    (message: string, details?: any) => {
+      return errorHandler.createValidationError(message, details);
+    },
+    []
+  );
 
   const createSyncError = useCallback((message: string, details?: any) => {
     return errorHandler.createSyncError(message, details);
@@ -73,7 +79,11 @@ export const useErrorFactory = () => {
 /**
  * Hook to handle API mutation errors with automatic retry
  */
-export const useApiErrorHandler = <TData = any, TError = Error, TVariables = any>(
+export const useApiErrorHandler = <
+  TData = any,
+  TError = Error,
+  TVariables = any,
+>(
   mutationFn: (variables: TVariables) => Promise<TData>,
   options?: {
     maxRetries?: number;
@@ -94,15 +104,15 @@ export const useApiErrorHandler = <TData = any, TError = Error, TVariables = any
     },
     onError: (error: TError) => {
       const appError = handleError(error as Error, options?.context);
-      
+
       // Check if we should retry
       const shouldRetry = errorHandler.shouldRetry(appError, retryCount + 1);
       const maxRetries = options?.maxRetries || 3;
-      
+
       if (shouldRetry && retryCount < maxRetries) {
         const delay = errorHandler.getRetryDelay(retryCount + 1);
-        setRetryCount(prev => prev + 1);
-        
+        setRetryCount((prev) => prev + 1);
+
         setTimeout(() => {
           // Retry mutation (this would need to be implemented based on use case)
         }, delay);
@@ -118,49 +128,58 @@ export const useApiErrorHandler = <TData = any, TError = Error, TVariables = any
  * Hook to handle error recovery strategies
  */
 export const useErrorRecovery = () => {
-  const [recoveryAttempts, setRecoveryAttempts] = useState<Map<string, number>>(new Map());
+  const [recoveryAttempts, setRecoveryAttempts] = useState<Map<string, number>>(
+    new Map()
+  );
 
-  const executeRecovery = useCallback(async (
-    errorCode: string,
-    strategy: ErrorRecoveryStrategy
-  ): Promise<boolean> => {
-    const attempts = recoveryAttempts.get(errorCode) || 0;
+  const executeRecovery = useCallback(
+    async (
+      errorCode: string,
+      strategy: ErrorRecoveryStrategy
+    ): Promise<boolean> => {
+      const attempts = recoveryAttempts.get(errorCode) || 0;
 
-    switch (strategy.type) {
-      case 'retry':
-        if (attempts < (strategy.retryAttempts || 3)) {
-          setRecoveryAttempts(prev => new Map(prev).set(errorCode, attempts + 1));
-          
-          if (strategy.retryDelay) {
-            await new Promise(resolve => setTimeout(resolve, strategy.retryDelay));
+      switch (strategy.type) {
+        case 'retry':
+          if (attempts < (strategy.retryAttempts || 3)) {
+            setRecoveryAttempts((prev) =>
+              new Map(prev).set(errorCode, attempts + 1)
+            );
+
+            if (strategy.retryDelay) {
+              await new Promise((resolve) =>
+                setTimeout(resolve, strategy.retryDelay)
+              );
+            }
+
+            return true; // Signal to retry
           }
-          
-          return true; // Signal to retry
-        }
-        return false;
+          return false;
 
-      case 'fallback':
-        strategy.fallbackAction?.();
-        return true;
+        case 'fallback':
+          strategy.fallbackAction?.();
+          return true;
 
-      case 'redirect':
-        // Would implement navigation here
-        console.log('Would navigate to:', strategy.redirectPath);
-        return true;
+        case 'redirect':
+          // Would implement navigation here
+          console.log('Would navigate to:', strategy.redirectPath);
+          return true;
 
-      case 'ignore':
-        if (strategy.ignoreUntil && new Date() < strategy.ignoreUntil) {
-          return true; // Ignore error
-        }
-        return false;
+        case 'ignore':
+          if (strategy.ignoreUntil && new Date() < strategy.ignoreUntil) {
+            return true; // Ignore error
+          }
+          return false;
 
-      default:
-        return false;
-    }
-  }, [recoveryAttempts]);
+        default:
+          return false;
+      }
+    },
+    [recoveryAttempts]
+  );
 
   const resetRecoveryAttempts = useCallback((errorCode: string) => {
-    setRecoveryAttempts(prev => {
+    setRecoveryAttempts((prev) => {
       const newMap = new Map(prev);
       newMap.delete(errorCode);
       return newMap;
@@ -183,21 +202,24 @@ export const useErrorDialog = () => {
     options: ErrorDisplayOptions;
   } | null>(null);
 
-  const showErrorDialog = useCallback((
-    error: AppError,
-    options: ErrorDisplayOptions
-  ) => {
-    setActiveError({ error, options });
-  }, []);
+  const showErrorDialog = useCallback(
+    (error: AppError, options: ErrorDisplayOptions) => {
+      setActiveError({ error, options });
+    },
+    []
+  );
 
   const hideErrorDialog = useCallback(() => {
     setActiveError(null);
   }, []);
 
-  const executeAction = useCallback((action: ErrorAction) => {
-    action.onPress();
-    hideErrorDialog();
-  }, [hideErrorDialog]);
+  const executeAction = useCallback(
+    (action: ErrorAction) => {
+      action.onPress();
+      hideErrorDialog();
+    },
+    [hideErrorDialog]
+  );
 
   return {
     activeError,
@@ -217,7 +239,9 @@ export const useQueryErrorHandler = () => {
   // Global error handler for queries
   useEffect(() => {
     const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
-      if (event.type === 'queryError' && event.query.state.error) {
+      // Note: Query cache events don't include 'queryError' type in current TanStack Query version
+      // This is kept for future compatibility but currently won't trigger
+      if ('query' in event && event.query?.state?.error) {
         const error = event.query.state.error as Error;
         const context: ErrorContext = {
           action: 'query',
@@ -237,12 +261,14 @@ export const useQueryErrorHandler = () => {
   // Global error handler for mutations
   useEffect(() => {
     const unsubscribe = queryClient.getMutationCache().subscribe((event) => {
-      if (event.type === 'mutationError' && event.mutation.state.error) {
+      // Note: Mutation cache events don't include 'mutationError' type in current TanStack Query version
+      // This is kept for future compatibility but currently won't trigger
+      if ('mutation' in event && event.mutation?.state?.error) {
         const error = event.mutation.state.error as Error;
         const context: ErrorContext = {
           action: 'mutation',
           additionalData: {
-            mutationKey: event.mutation.options.mutationKey,
+            mutationKey: event.mutation.options?.mutationKey,
             variables: event.mutation.state.variables,
           },
         };

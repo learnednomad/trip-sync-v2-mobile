@@ -16,8 +16,23 @@ const _useAuth = create<AuthState>((set, get) => ({
   status: 'idle',
   token: null,
   signIn: (token) => {
+    console.log('🔐 Auth store signIn called with:', {
+      access: token?.access?.length ? `${token.access.substring(0, 20)}...` : 'MISSING',
+      refresh: token?.refresh?.length ? `${token.refresh.substring(0, 20)}...` : 'MISSING',
+    });
+    
     setToken(token);
     set({ status: 'signIn', token });
+    
+    // Verify storage immediately after setting
+    setTimeout(() => {
+      const storedToken = getToken();
+      console.log('💾 Token verification after storage:', {
+        stored: !!storedToken,
+        accessLength: storedToken?.access?.length || 0,
+        refreshLength: storedToken?.refresh?.length || 0,
+      });
+    }, 100);
   },
   signOut: () => {
     removeToken();

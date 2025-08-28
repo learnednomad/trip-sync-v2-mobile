@@ -115,7 +115,11 @@ class OfflineStorageService {
   }
 
   // Trip-specific storage
-  storeTrip(tripId: string, trip: any, metadata?: Partial<StorageMetadata>): void {
+  storeTrip(
+    tripId: string,
+    trip: any,
+    metadata?: Partial<StorageMetadata>
+  ): void {
     const key = `trip:${tripId}`;
     const storedTrip: StoredTrip = {
       data: trip,
@@ -134,10 +138,14 @@ class OfflineStorageService {
     return this.getData<StoredTrip>(`trip:${tripId}`);
   }
 
-  storeTripsList(trips: any[], filters?: Record<string, any>, pagination?: any): void {
+  storeTripsList(
+    trips: any[],
+    filters?: Record<string, any>,
+    pagination?: any
+  ): void {
     const now = new Date().toISOString();
     const key = 'trips:list';
-    
+
     const storedList: StoredTripsList = {
       trips,
       metadata: this.createMetadata(key),
@@ -175,10 +183,15 @@ class OfflineStorageService {
   }
 
   // Cache Management
-  setCache<T>(key: string, data: T, ttl: number = 300000, tags: string[] = []): void {
+  setCache<T>(
+    key: string,
+    data: T,
+    ttl: number = 300000,
+    tags: string[] = []
+  ): void {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + ttl);
-    
+
     const cacheEntry: CacheEntry<T> = {
       key,
       data,
@@ -198,7 +211,7 @@ class OfflineStorageService {
 
     try {
       const entry: CacheEntry<T> = JSON.parse(raw);
-      
+
       // Check expiration
       if (new Date() > new Date(entry.expiresAt)) {
         this.deleteRaw(`cache:${key}`);
@@ -215,21 +228,23 @@ class OfflineStorageService {
   }
 
   invalidateCache(pattern?: string | RegExp): void {
-    const keys = this.getAllKeys().filter(key => key.startsWith('cache:'));
-    
+    const keys = this.getAllKeys().filter((key) => key.startsWith('cache:'));
+
     if (!pattern) {
       // Clear all cache
-      keys.forEach(key => this.deleteRaw(key));
+      keys.forEach((key) => this.deleteRaw(key));
       this.log('Cleared all cache');
       return;
     }
 
     // Pattern matching
     const regex = pattern instanceof RegExp ? pattern : new RegExp(pattern);
-    keys.filter(key => regex.test(key)).forEach(key => {
-      this.deleteRaw(key);
-      this.log('Invalidated cache:', key);
-    });
+    keys
+      .filter((key) => regex.test(key))
+      .forEach((key) => {
+        this.deleteRaw(key);
+        this.log('Invalidated cache:', key);
+      });
   }
 
   // Sync Operations
@@ -258,9 +273,9 @@ class OfflineStorageService {
   }
 
   getPendingChanges(): PendingChange[] {
-    const keys = this.getAllKeys().filter(key => key.startsWith('pending:'));
+    const keys = this.getAllKeys().filter((key) => key.startsWith('pending:'));
     return keys
-      .map(key => this.getData<PendingChange>(key))
+      .map((key) => this.getData<PendingChange>(key))
       .filter(Boolean) as PendingChange[];
   }
 
@@ -308,16 +323,20 @@ class OfflineStorageService {
   }
 
   getConflicts(): ConflictEntry[] {
-    const keys = this.getAllKeys().filter(key => key.startsWith('conflict:'));
+    const keys = this.getAllKeys().filter((key) => key.startsWith('conflict:'));
     return keys
-      .map(key => this.getData<ConflictEntry>(key))
+      .map((key) => this.getData<ConflictEntry>(key))
       .filter(Boolean) as ConflictEntry[];
   }
 
-  resolveConflict(conflictId: string, resolution: 'local' | 'remote' | 'merge', mergedData?: any): void {
+  resolveConflict(
+    conflictId: string,
+    resolution: 'local' | 'remote' | 'merge',
+    mergedData?: any
+  ): void {
     const key = `conflict:${conflictId}`;
     const conflict = this.getData<ConflictEntry>(key);
-    
+
     if (!conflict) return;
 
     let resolvedData: any;
@@ -329,7 +348,10 @@ class OfflineStorageService {
         resolvedData = conflict.remoteData;
         break;
       case 'merge':
-        resolvedData = mergedData || { ...conflict.localData, ...conflict.remoteData };
+        resolvedData = mergedData || {
+          ...conflict.localData,
+          ...conflict.remoteData,
+        };
         break;
     }
 
@@ -350,10 +372,10 @@ class OfflineStorageService {
     const allKeys = this.getAllKeys();
     const pendingChanges = this.getPendingChanges().length;
     const conflicts = this.getConflicts().length;
-    
+
     // Calculate total size (approximate)
     let totalSize = 0;
-    allKeys.forEach(key => {
+    allKeys.forEach((key) => {
       const value = this.getRaw(key);
       if (value) {
         totalSize += value.length;
@@ -373,12 +395,12 @@ class OfflineStorageService {
   cleanup(): void {
     // Remove expired cache entries
     this.invalidateCache();
-    
+
     // Clean up old pending changes (older than 7 days)
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const pendingChanges = this.getPendingChanges();
-    
-    pendingChanges.forEach(change => {
+
+    pendingChanges.forEach((change) => {
       if (new Date(change.timestamp) < sevenDaysAgo) {
         this.removePendingChange(change.id);
       }
@@ -394,7 +416,10 @@ class OfflineStorageService {
   }
 
   // Helper Methods
-  private createMetadata(key: string, partial?: Partial<StorageMetadata>): StorageMetadata {
+  private createMetadata(
+    key: string,
+    partial?: Partial<StorageMetadata>
+  ): StorageMetadata {
     const now = new Date().toISOString();
     return {
       key,

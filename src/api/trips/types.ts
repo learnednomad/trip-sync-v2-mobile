@@ -6,7 +6,12 @@
 import type { ApiResponse, SearchParams } from '@/api/common/types';
 
 // Enums
-export type TripStatus = 'PLANNING' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type TripStatus =
+  | 'PLANNING'
+  | 'CONFIRMED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'CANCELLED';
 export type ParticipantRole = 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER';
 export type ParticipantStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED';
 
@@ -31,8 +36,9 @@ export interface Trip {
   name: string;
   description?: string;
   startDate: string; // ISO date string
-  endDate: string;   // ISO date string
+  endDate: string; // ISO date string
   destination: string;
+  tripType: TripType;
   coverImageUrl?: string;
   status: TripStatus;
   budgetAmount?: number;
@@ -115,6 +121,7 @@ export interface CreateTripRequest {
   startDate: string;
   endDate: string;
   destination: string;
+  tripType: TripType;
   coverImageUrl?: string;
   budgetAmount?: number;
   budgetCurrency?: string;
@@ -126,10 +133,29 @@ export interface UpdateTripRequest extends Partial<CreateTripRequest> {
   version: number; // For optimistic locking
 }
 
+export type TripType = 
+  | 'BUSINESS' 
+  | 'LEISURE' 
+  | 'FAMILY' 
+  | 'ADVENTURE' 
+  | 'ROMANTIC' 
+  | 'EDUCATIONAL' 
+  | 'CULTURAL' 
+  | 'WELLNESS';
+
 export interface TripListParams extends SearchParams {
   status?: TripStatus;
   upcoming?: boolean;
   role?: ParticipantRole;
+  // Advanced search filters
+  destination?: string;
+  tripType?: TripType;
+  startDateFrom?: string;
+  startDateTo?: string;
+  endDateFrom?: string;
+  endDateTo?: string;
+  minDuration?: number;
+  maxDuration?: number;
 }
 
 export interface InviteParticipantRequest {
@@ -183,7 +209,10 @@ export type TripListApiResponse = ApiResponse<TripListResponse>;
 export type TripDetailApiResponse = ApiResponse<TripDetailResponse>;
 export type CreateTripApiResponse = ApiResponse<CreateTripResponse>;
 export type UpdateTripApiResponse = ApiResponse<UpdateTripResponse>;
-export type InviteParticipantApiResponse = ApiResponse<InviteParticipantResponse>;
-export type UpdateParticipantApiResponse = ApiResponse<UpdateParticipantResponse>;
+export type InviteParticipantApiResponse =
+  ApiResponse<InviteParticipantResponse>;
+export type UpdateParticipantApiResponse =
+  ApiResponse<UpdateParticipantResponse>;
 export type DeleteTripApiResponse = ApiResponse<DeleteTripResponse>;
-export type RemoveParticipantApiResponse = ApiResponse<RemoveParticipantResponse>;
+export type RemoveParticipantApiResponse =
+  ApiResponse<RemoveParticipantResponse>;

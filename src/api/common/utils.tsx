@@ -3,7 +3,7 @@ import type {
   GetPreviousPageParamFunction,
 } from '@tanstack/react-query';
 
-import type { ApiMetadata, ApiResponse, PaginationParams } from './types';
+import type { ApiResponse, PaginationParams } from './types';
 
 type KeyParams = {
   [key: string]: any;
@@ -22,12 +22,12 @@ export function getQueryKey<T extends KeyParams>(key: string, params?: T) {
 /**
  * Normalize paginated API response for backend compatibility
  */
-export function normalizePages<T>(
-  pages?: ApiResponse<T[]>[]
-): T[] {
+export function normalizePages<T>(pages?: ApiResponse<T[]>[]): T[] {
   return pages && pages.length > 0
     ? pages.reduce((prev: T[], current) => {
-        return current.success && current.data ? [...prev, ...current.data] : prev;
+        return current.success && current.data
+          ? [...prev, ...current.data]
+          : prev;
       }, [])
     : [];
 }
@@ -61,7 +61,7 @@ export const getPreviousPageParam: GetPreviousPageParamFunction<
   ApiResponse<unknown[]>
 > = (firstPage) => {
   if (!firstPage.success || !firstPage.metadata) return undefined;
-  
+
   const { page = 1 } = firstPage.metadata;
   return page > 1 ? page - 1 : undefined;
 };
@@ -71,7 +71,7 @@ export const getNextPageParam: GetNextPageParamFunction<
   ApiResponse<unknown[]>
 > = (lastPage) => {
   if (!lastPage.success || !lastPage.metadata) return undefined;
-  
+
   const { page = 1, hasMore = false } = lastPage.metadata;
   return hasMore ? page + 1 : undefined;
 };
@@ -117,12 +117,12 @@ export function isOnline(): boolean {
 export function generateCacheKey(endpoint: string, params?: any): string {
   const baseKey = endpoint.replace(/\//g, '_');
   if (!params) return baseKey;
-  
+
   const paramString = Object.keys(params)
     .sort()
-    .map(key => `${key}-${params[key]}`)
+    .map((key) => `${key}-${params[key]}`)
     .join('_');
-  
+
   return `${baseKey}_${paramString}`;
 }
 
@@ -134,7 +134,7 @@ export function debounce<T extends (...args: any[]) => any>(
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout>;
-  
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);

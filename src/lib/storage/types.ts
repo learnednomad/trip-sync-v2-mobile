@@ -8,20 +8,20 @@ export enum StorageKeys {
   // Authentication
   AUTH_TOKEN = 'auth_token',
   USER_PROFILE = 'user_profile',
-  
+
   // Trips
   TRIPS_LIST = 'trips_list',
   TRIP_DETAILS = 'trip_details',
   TRIP_PARTICIPANTS = 'trip_participants',
-  
+
   // Sync State
   SYNC_METADATA = 'sync_metadata',
   PENDING_CHANGES = 'pending_changes',
   CONFLICT_QUEUE = 'conflict_queue',
-  
+
   // Cache
   CACHE_METADATA = 'cache_metadata',
-  
+
   // App State
   APP_SETTINGS = 'app_settings',
   THEME_SETTINGS = 'theme_settings',
@@ -29,7 +29,12 @@ export enum StorageKeys {
 }
 
 // Sync States
-export type SyncStatus = 'synced' | 'pending' | 'syncing' | 'conflict' | 'error';
+export type SyncStatus =
+  | 'synced'
+  | 'pending'
+  | 'syncing'
+  | 'conflict'
+  | 'error';
 
 // Change Operations
 export type ChangeOperation = 'create' | 'update' | 'delete';

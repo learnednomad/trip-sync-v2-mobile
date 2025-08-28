@@ -4,11 +4,11 @@
  */
 
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import errorHandler from './error-handler';
-import type { AppError, ErrorContext } from './types';
+import type { ErrorContext } from './types';
 
 interface ErrorFallbackProps {
   error: Error;
@@ -19,7 +19,11 @@ interface ErrorFallbackProps {
 /**
  * Default Error Fallback Component
  */
-const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError, context }) => {
+const ErrorFallback: React.FC<ErrorFallbackProps> = ({
+  error,
+  resetError,
+  context,
+}) => {
   const appError = errorHandler.handleError(error, context, { silent: true });
 
   return (
@@ -27,12 +31,11 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError, contex
       <View style={styles.content}>
         <Text style={styles.title}>Something went wrong</Text>
         <Text style={styles.message}>
-          {appError.recoverable 
+          {appError.recoverable
             ? "We've encountered an unexpected error. You can try again or go back."
-            : "We've encountered a critical error. Please restart the app."
-          }
+            : "We've encountered a critical error. Please restart the app."}
         </Text>
-        
+
         {__DEV__ && (
           <View style={styles.debugInfo}>
             <Text style={styles.debugTitle}>Debug Info:</Text>
@@ -43,16 +46,16 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError, contex
             <Text style={styles.debugText}>Severity: {appError.severity}</Text>
           </View>
         )}
-        
+
         <View style={styles.actions}>
           {appError.recoverable && (
             <TouchableOpacity style={styles.primaryButton} onPress={resetError}>
               <Text style={styles.primaryButtonText}>Try Again</Text>
             </TouchableOpacity>
           )}
-          
-          <TouchableOpacity 
-            style={styles.secondaryButton} 
+
+          <TouchableOpacity
+            style={styles.secondaryButton}
             onPress={() => {
               // Would implement navigation to home/safe screen
               console.log('Would navigate to home screen');
@@ -70,7 +73,7 @@ interface AppErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: React.ComponentType<ErrorFallbackProps>;
   context?: ErrorContext;
-  onError?: (error: Error, errorInfo: { componentStack: string }) => void;
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
 }
 
 /**
@@ -82,7 +85,7 @@ export const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({
   context,
   onError,
 }) => {
-  const handleError = (error: Error, errorInfo: { componentStack: string }) => {
+  const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
     // Add breadcrumb
     errorHandler.addBreadcrumb(
       `React Error Boundary caught error: ${error.name}`,
@@ -94,12 +97,12 @@ export const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({
       ...context,
       component: 'ErrorBoundary',
       additionalData: {
-        componentStack: errorInfo.componentStack,
+        componentStack: errorInfo.componentStack || 'Unknown',
       },
     };
 
     errorHandler.handleError(error, enhancedContext, { silent: true });
-    
+
     // Call custom error handler
     onError?.(error, errorInfo);
   };
@@ -108,7 +111,13 @@ export const AppErrorBoundary: React.FC<AppErrorBoundaryProps> = ({
     <ReactErrorBoundary
       FallbackComponent={(props) => {
         const FallbackComponent = fallback;
-        return <FallbackComponent {...props} context={context} />;
+        return (
+          <FallbackComponent
+            {...props}
+            resetError={props.resetErrorBoundary}
+            context={context}
+          />
+        );
       }}
       onError={handleError}
     >
@@ -174,11 +183,13 @@ export const withErrorBoundary = <P extends object>(
   fallback?: React.ComponentType<ErrorFallbackProps>
 ) => {
   return React.forwardRef<any, P>((props, ref) => (
-    <ComponentErrorBoundary 
-      componentName={componentName || Component.displayName || Component.name || 'Component'}
+    <ComponentErrorBoundary
+      componentName={
+        componentName || Component.displayName || Component.name || 'Component'
+      }
       fallback={fallback}
     >
-      <Component {...props} ref={ref} />
+      <Component {...(props as P)} ref={ref} />
     </ComponentErrorBoundary>
   ));
 };

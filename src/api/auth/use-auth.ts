@@ -6,7 +6,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 
-import { signIn as authSignIn, signOut as authSignOut, useAuth } from '@/lib/auth';
+import {
+  signIn as authSignIn,
+  signOut as authSignOut,
+  useAuth,
+} from '@/lib/auth';
 
 import * as authApi from './api';
 import type {
@@ -14,7 +18,6 @@ import type {
   LogoutRequest,
   PasswordResetRequest,
   RegisterRequest,
-  VerifyTokenRequest,
 } from './types';
 
 // Query Keys
@@ -23,7 +26,8 @@ export const authKeys = {
   user: () => [...authKeys.all, 'user'] as const,
   config: () => [...authKeys.all, 'config'] as const,
   verify: (token: string) => [...authKeys.all, 'verify', token] as const,
-  tokenCheck: (token: string) => [...authKeys.all, 'token-check', token] as const,
+  tokenCheck: (token: string) =>
+    [...authKeys.all, 'token-check', token] as const,
 };
 
 /**
@@ -31,7 +35,7 @@ export const authKeys = {
  */
 export const useCurrentUser = () => {
   const { token, status } = useAuth();
-  
+
   return useQuery({
     queryKey: authKeys.user(),
     queryFn: authApi.getCurrentUser,
@@ -74,13 +78,13 @@ export const useRegister = () => {
           access: response.data.tokens.access,
           refresh: response.data.tokens.refresh,
         });
-        
+
         // Cache user data
         queryClient.setQueryData(authKeys.user(), {
           success: true,
           data: { user: response.data.user },
         });
-        
+
         // Navigate to main app
         router.replace('/(app)/(tabs)/');
       }
@@ -101,19 +105,39 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
     onSuccess: (response) => {
+      console.log('🔍 Full login response:', JSON.stringify(response, null, 2));
+      
       if (response.success && response.data) {
-        // Sign in user with returned tokens
-        authSignIn({
-          access: response.data.tokens.access,
-          refresh: response.data.tokens.refresh,
-        });
+        console.log('📊 Tokens structure:', response.data.tokens);
+        console.log('🔑 Available token fields:', Object.keys(response.data.tokens || {}));
         
+        // Enhanced token extraction - handles multiple possible field names
+        const tokens = response.data.tokens;
+        const accessToken = tokens?.access || tokens?.accessToken || tokens?.token;
+        const refreshToken = tokens?.refresh || tokens?.refreshToken;
+        
+        console.log('🎯 Extracted tokens:');
+        console.log('  - Access token length:', accessToken?.length || 0);
+        console.log('  - Refresh token length:', refreshToken?.length || 0);
+        
+        if (accessToken && refreshToken) {
+          // Sign in user with returned tokens
+          authSignIn({
+            access: accessToken,
+            refresh: refreshToken,
+          });
+          console.log('✅ Tokens stored successfully via authSignIn');
+        } else {
+          console.error('❌ Could not extract valid tokens from response');
+          console.error('Available fields:', tokens ? Object.keys(tokens) : 'No tokens object');
+        }
+
         // Cache user data
         queryClient.setQueryData(authKeys.user(), {
           success: true,
           data: { user: response.data.user },
         });
-        
+
         // Navigate to main app
         router.replace('/(app)/(tabs)/');
       }
@@ -143,10 +167,10 @@ export const useLogout = () => {
     onSuccess: () => {
       // Sign out user locally
       authSignOut();
-      
+
       // Clear all auth-related queries
       queryClient.removeQueries({ queryKey: authKeys.all });
-      
+
       // Navigate to sign in screen
       router.replace('/sign-in');
     },
@@ -165,7 +189,8 @@ export const useLogout = () => {
  */
 export const usePasswordReset = () => {
   return useMutation({
-    mutationFn: (data: PasswordResetRequest) => authApi.requestPasswordReset(data),
+    mutationFn: (data: PasswordResetRequest) =>
+      authApi.requestPasswordReset(data),
     onSuccess: (response) => {
       if (response.success) {
         console.log('Password reset email sent');

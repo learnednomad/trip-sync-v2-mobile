@@ -34,7 +34,6 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="com.trip_sync_mobile_v2.development.auth0" android:host="dev-ozj57g7cugqqjv1n.us.auth0.com"/>
-        <data android:scheme="com.trip_sync_mobile_v2.development.auth0" android:host="dev-ozj57g7cugqqjv1n.us.auth0.com"/>
       </intent-filter>
     </activity>
   </application>

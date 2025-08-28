@@ -4,7 +4,7 @@
  */
 
 // Event Types
-export type RealtimeEventType = 
+export type RealtimeEventType =
   | 'trip:updated'
   | 'trip:deleted'
   | 'trip:participant_added'
@@ -80,7 +80,12 @@ export interface RealtimeEvent<T = any> {
 }
 
 // Connection States
-export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'reconnecting' | 'error';
+export type ConnectionStatus =
+  | 'connecting'
+  | 'connected'
+  | 'disconnected'
+  | 'reconnecting'
+  | 'error';
 
 // Real-time Service Configuration
 export interface RealtimeConfig {
@@ -118,16 +123,20 @@ export interface RealtimeService {
   connect(): Promise<void>;
   disconnect(): void;
   getStatus(): ConnectionStatus;
-  
+
   // Event Management
-  on<T>(eventType: RealtimeEventType, handler: EventHandler<T>, tripId?: string): EventSubscription;
+  on<T>(
+    eventType: RealtimeEventType,
+    handler: EventHandler<T>,
+    tripId?: string
+  ): EventSubscription;
   off(subscriptionId: string): void;
   emit<T>(eventType: RealtimeEventType, data: T, tripId?: string): void;
-  
+
   // Trip-specific subscriptions
   joinTrip(tripId: string): Promise<TripSubscription>;
   leaveTrip(tripId: string): void;
-  
+
   // Connection status
   onConnectionChange(handler: ConnectionHandler): () => void;
   onError(handler: ErrorHandler): () => void;

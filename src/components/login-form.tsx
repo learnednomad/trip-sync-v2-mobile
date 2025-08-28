@@ -25,9 +25,11 @@ export type FormType = z.infer<typeof schema>;
 
 export type LoginFormProps = {
   onSubmit?: SubmitHandler<FormType>;
+  isLoading?: boolean;
+  error?: Error | null;
 };
 
-export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
+export const LoginForm = ({ onSubmit = () => {}, isLoading = false, error }: LoginFormProps) => {
   const { handleSubmit, control } = useForm<FormType>({
     resolver: zodResolver(schema),
   });
@@ -47,9 +49,16 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
           </Text>
 
           <Text className="mb-6 max-w-xs text-center text-gray-500">
-            Welcome! 👋 This is a demo login screen! Feel free to use any email
-            and password to sign in and try it out.
+            Welcome! 👋 Sign in with your Trip Sync account to continue.
           </Text>
+
+          {error && (
+            <View className="mb-4 rounded-lg bg-red-50 p-3">
+              <Text className="text-center text-sm text-red-600">
+                {error.message || 'Login failed. Please try again.'}
+              </Text>
+            </View>
+          )}
         </View>
 
         <ControlledInput
@@ -75,8 +84,9 @@ export const LoginForm = ({ onSubmit = () => {} }: LoginFormProps) => {
         />
         <Button
           testID="login-button"
-          label="Login"
+          label={isLoading ? "Signing in..." : "Login"}
           onPress={handleSubmit(onSubmit)}
+          disabled={isLoading}
         />
       </View>
     </KeyboardAvoidingView>
