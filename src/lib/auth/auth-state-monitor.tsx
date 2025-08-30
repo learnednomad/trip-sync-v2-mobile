@@ -25,6 +25,8 @@ export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({
   const [stateInfo, setStateInfo] = React.useState<AuthStateInfo | null>(null);
   const [initializationComplete, setInitializationComplete] =
     React.useState(false);
+  const [lastLogTime, setLastLogTime] = React.useState<number>(0);
+  const [stableStateCount, setStableStateCount] = React.useState<number>(0);
 
   // Monitor auth state changes
   React.useEffect(() => {
@@ -48,14 +50,24 @@ export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({
       setStateInfo(info);
 
       if (__DEV__) {
-        console.log('🔍 Auth State Monitor Update:', {
-          status: info.storeStatus,
-          storeToken: info.storeHasToken,
-          storageToken: info.storageHasToken,
-          tokensMatch: info.tokensMatch,
-          accessLength: info.accessTokenLength,
-          refreshLength: info.refreshTokenLength,
-        });
+        // Debounce logging - only log if state changed or every 60 seconds
+        const now = Date.now();
+        const stateChanged = !stateInfo || 
+          stateInfo.storeStatus !== info.storeStatus ||
+          stateInfo.tokensMatch !== info.tokensMatch;
+        const timeSinceLastLog = now - lastLogTime;
+        
+        if (stateChanged || timeSinceLastLog > 60000) { // 60 seconds
+          console.log('🔍 Auth State Monitor Update:', {
+            status: info.storeStatus,
+            storeToken: info.storeHasToken,
+            storageToken: info.storageHasToken,
+            tokensMatch: info.tokensMatch,
+            accessLength: info.accessTokenLength,
+            refreshLength: info.refreshTokenLength,
+          });
+          setLastLogTime(now);
+        }
 
         // Check for potential issues
         if (info.storeHasToken && !info.storageHasToken) {
@@ -81,8 +93,8 @@ export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({
     // Initial check
     updateStateInfo();
 
-    // Set up periodic monitoring
-    const interval = setInterval(updateStateInfo, 5000); // Check every 5 seconds
+    // Set up optimized periodic monitoring
+    const interval = setInterval(updateStateInfo, 30000); // Check every 30 seconds (reduced from 5s)
 
     return () => clearInterval(interval);
   }, [authState.status, authState.token]);
