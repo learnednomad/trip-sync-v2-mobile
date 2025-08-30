@@ -11,8 +11,8 @@ import { Text } from './text';
  * Shows when app-wide operations are in progress
  */
 export const GlobalLoadingOverlay: React.FC = () => {
-  const globalLoading = useNavigationStore.use.globalLoading();
-  const loadingMessage = useNavigationStore.use.loadingMessage();
+  const globalLoading = useNavigationStore.use.globalLoading?.() || false;
+  const loadingMessage = useNavigationStore.use.loadingMessage?.() || '';
 
   if (!globalLoading) return null;
 
@@ -38,15 +38,26 @@ export const GlobalLoadingOverlay: React.FC = () => {
  * Hook for controlling global loading state
  */
 export const useGlobalLoading = () => {
-  const showGlobalLoading = useNavigationStore.use.showGlobalLoading();
-  const hideGlobalLoading = useNavigationStore.use.hideGlobalLoading();
-  const isLoading = useNavigationStore.use.globalLoading();
-  const message = useNavigationStore.use.loadingMessage();
+  const showGlobalLoading = useNavigationStore.use.showGlobalLoading?.() || (() => {});
+  const hideGlobalLoading = useNavigationStore.use.hideGlobalLoading?.() || (() => {});
+  const isLoading = useNavigationStore.use.globalLoading?.() || false;
+  const message = useNavigationStore.use.loadingMessage?.() || '';
 
   return {
     isLoading,
-    message,
+    message: message || undefined,
     show: showGlobalLoading,
     hide: hideGlobalLoading,
+    
+    // Utility function for wrapping async operations  
+    withLoading: async (operation: () => Promise<any>, loadingMessage?: string) => {
+      try {
+        showGlobalLoading(loadingMessage);
+        const result = await operation();
+        return result;
+      } finally {
+        hideGlobalLoading();
+      }
+    },
   };
 };

@@ -214,17 +214,31 @@ export const useNotifications = () => {
         type: 'success',
         title,
         message,
+        read: false,
+        timestamp: new Date().toISOString(),
         actionUrl,
         actionLabel,
       });
     },
 
     showError: (title: string, message: string) => {
-      addNotification({ type: 'error', title, message });
+      addNotification({ 
+        type: 'error', 
+        title, 
+        message,
+        read: false,
+        timestamp: new Date().toISOString(),
+      });
     },
 
     showWarning: (title: string, message: string) => {
-      addNotification({ type: 'warning', title, message });
+      addNotification({ 
+        type: 'warning', 
+        title, 
+        message,
+        read: false,
+        timestamp: new Date().toISOString(),
+      });
     },
 
     showInfo: (
@@ -233,7 +247,15 @@ export const useNotifications = () => {
       actionUrl?: string,
       actionLabel?: string
     ) => {
-      addNotification({ type: 'info', title, message, actionUrl, actionLabel });
+      addNotification({ 
+        type: 'info', 
+        title, 
+        message,
+        read: false,
+        timestamp: new Date().toISOString(),
+        actionUrl, 
+        actionLabel 
+      });
     },
   };
 };

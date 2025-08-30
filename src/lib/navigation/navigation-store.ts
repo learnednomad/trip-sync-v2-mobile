@@ -14,6 +14,15 @@ interface NavigationState {
   navigationHistory: string[];
   breadcrumbs: Breadcrumb[];
 
+  // Trip context state (consolidated from trip-context.tsx)
+  currentTripId: string | null;
+  tripPermissions: {
+    userRole: string | null;
+    canEdit: boolean;
+    canInvite: boolean;
+    canDelete: boolean;
+  } | null;
+
   // Global UI state
   activeModal: string | null;
   searchQuery: string;
@@ -54,6 +63,11 @@ interface NavigationState {
   removeNotification: (id: string) => void;
   markAllRead: () => void;
 
+  // Trip context actions
+  setCurrentTrip: (tripId: string | null) => void;
+  setTripPermissions: (permissions: NavigationState['tripPermissions']) => void;
+  clearTripContext: () => void;
+
   // UI controls
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
@@ -76,6 +90,10 @@ const _useNavigationStore = create<NavigationState>()(
       // Initial state
       navigationHistory: [],
       breadcrumbs: [{ label: 'Home', route: '/(app)' }],
+
+      // Trip context state
+      currentTripId: null,
+      tripPermissions: null,
 
       activeModal: null,
       searchQuery: '',
@@ -193,6 +211,31 @@ const _useNavigationStore = create<NavigationState>()(
       setSidebarOpen: (open: boolean) => {
         set({ sidebarOpen: open });
       },
+
+      // Trip context actions
+      setCurrentTrip: (tripId: string | null) => {
+        set({ currentTripId: tripId });
+        
+        // Store in MMKV for persistence
+        if (tripId) {
+          storage.set('@trip-sync/current-trip', tripId);
+        } else {
+          storage.delete('@trip-sync/current-trip');
+        }
+      },
+
+      setTripPermissions: (permissions) => {
+        set({ tripPermissions: permissions });
+      },
+
+      clearTripContext: () => {
+        set({ 
+          currentTripId: null, 
+          tripPermissions: null,
+          breadcrumbs: [{ label: 'Home', route: '/(app)' }],
+        });
+        storage.delete('@trip-sync/current-trip');
+      },
     }),
     {
       name: '@trip-sync/navigation',
@@ -213,6 +256,7 @@ const _useNavigationStore = create<NavigationState>()(
         navigationHistory: state.navigationHistory.slice(-5), // Only keep last 5 routes
         searchQuery: state.searchQuery,
         sidebarOpen: state.sidebarOpen,
+        currentTripId: state.currentTripId, // Persist current trip
       }),
     }
   )

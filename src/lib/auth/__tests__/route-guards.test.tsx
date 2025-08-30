@@ -11,19 +11,38 @@ import {
   withGuest,
 } from '../route-guards';
 
-// Mock the auth store
-const mockStatus = jest.fn();
-const mockToken = jest.fn();
+// Mock NetInfo to prevent network-related errors
+jest.mock('@react-native-community/netinfo', () => ({
+  addEventListener: jest.fn(() => jest.fn()),
+  fetch: jest.fn(() => Promise.resolve({
+    isConnected: true,
+    isInternetReachable: true,
+    type: 'wifi',
+  })),
+}));
 
-const mockUseAuth = {
-  use: {
-    status: () => mockStatus(),
-    token: () => mockToken(),
-  },
+// Mock the auth store with proper Zustand selector structure
+const createMockAuthStore = () => {
+  let mockStatus = 'idle';
+  let mockToken = null;
+  
+  return {
+    use: {
+      status: () => mockStatus,
+      token: () => mockToken,
+    },
+    setState: (status: string, token: any) => {
+      mockStatus = status;
+      mockToken = token;
+    },
+    getState: () => ({ status: mockStatus, token: mockToken }),
+  };
 };
 
+const mockAuthStore = createMockAuthStore();
+
 jest.mock('../index', () => ({
-  useAuth: mockUseAuth,
+  useAuth: mockAuthStore,
 }));
 
 // Mock expo-router
@@ -45,8 +64,7 @@ describe('Route Guards', () => {
 
   describe('AuthGuard', () => {
     it('shows loading when auth status is idle', () => {
-      mockStatus.mockReturnValue('idle');
-      mockToken.mockReturnValue(null);
+      mockAuthStore.setState('idle', null);
 
       render(
         <AuthGuard>
@@ -58,8 +76,8 @@ describe('Route Guards', () => {
     });
 
     it('redirects to login when user is signed out', () => {
-      mockUseAuth.use.status.mockReturnValue('signOut');
-      mockUseAuth.use.token.mockReturnValue(null);
+      mockAuthStore.setState('signOut');
+      (null);
 
       render(
         <AuthGuard>
@@ -71,8 +89,8 @@ describe('Route Guards', () => {
     });
 
     it('redirects to custom route when specified', () => {
-      mockUseAuth.use.status.mockReturnValue('signOut');
-      mockUseAuth.use.token.mockReturnValue(null);
+      mockAuthStore.setState('signOut');
+      (null);
 
       render(
         <AuthGuard fallbackRoute="/(auth)/register">
@@ -84,8 +102,8 @@ describe('Route Guards', () => {
     });
 
     it('renders protected content when user is authenticated', () => {
-      mockUseAuth.use.status.mockReturnValue('signIn');
-      mockUseAuth.use.token.mockReturnValue({
+      mockAuthStore.setState('signIn');
+      ({
         access: 'token',
         refresh: 'refresh',
       });
@@ -102,8 +120,8 @@ describe('Route Guards', () => {
 
   describe('GuestGuard', () => {
     it('redirects to app when user is authenticated', () => {
-      mockUseAuth.use.status.mockReturnValue('signIn');
-      mockUseAuth.use.token.mockReturnValue({
+      mockAuthStore.setState('signIn');
+      ({
         access: 'token',
         refresh: 'refresh',
       });
@@ -118,8 +136,8 @@ describe('Route Guards', () => {
     });
 
     it('renders guest content when user is not authenticated', () => {
-      mockUseAuth.use.status.mockReturnValue('signOut');
-      mockUseAuth.use.token.mockReturnValue(null);
+      mockAuthStore.setState('signOut');
+      (null);
 
       render(
         <GuestGuard>
@@ -133,8 +151,8 @@ describe('Route Guards', () => {
 
   describe('Higher-Order Components', () => {
     it('withAuth protects component correctly', () => {
-      mockUseAuth.use.status.mockReturnValue('signIn');
-      mockUseAuth.use.token.mockReturnValue({
+      mockAuthStore.setState('signIn');
+      ({
         access: 'token',
         refresh: 'refresh',
       });
@@ -148,8 +166,8 @@ describe('Route Guards', () => {
     });
 
     it('withGuest protects component for guests only', () => {
-      mockUseAuth.use.status.mockReturnValue('signOut');
-      mockUseAuth.use.token.mockReturnValue(null);
+      mockAuthStore.setState('signOut');
+      (null);
 
       const TestComponent = () => <Text>Guest component</Text>;
       const GuestComponent = withGuest(TestComponent);
@@ -162,8 +180,8 @@ describe('Route Guards', () => {
 
   describe('useAuthStatus', () => {
     it('returns correct authentication status', () => {
-      mockUseAuth.use.status.mockReturnValue('signIn');
-      mockUseAuth.use.token.mockReturnValue({
+      mockAuthStore.setState('signIn');
+      ({
         access: 'token',
         refresh: 'refresh',
       });
@@ -182,8 +200,8 @@ describe('Route Guards', () => {
     });
 
     it('handles idle status correctly', () => {
-      mockUseAuth.use.status.mockReturnValue('idle');
-      mockUseAuth.use.token.mockReturnValue(null);
+      mockAuthStore.setState('idle');
+      (null);
 
       let authStatus: any;
       const TestComponent = () => {
