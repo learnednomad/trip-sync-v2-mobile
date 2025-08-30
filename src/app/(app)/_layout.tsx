@@ -1,5 +1,6 @@
 import { Link, Redirect, SplashScreen, Tabs } from 'expo-router';
 import React, { useCallback, useEffect } from 'react';
+import { useColorScheme } from 'react-native';
 
 import {
   GlobalLoadingOverlay,
@@ -22,6 +23,8 @@ import { TripNavigationProvider } from '@/lib/navigation/trip-context';
 export default function TabLayout() {
   const status = useAuth.use.status();
   const [isFirstTime] = useIsFirstTime();
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
   const hideSplash = useCallback(async () => {
     await SplashScreen.hideAsync();
   }, []);
@@ -44,19 +47,19 @@ export default function TabLayout() {
           <Tabs
             screenOptions={({ route }) => ({
               tabBarActiveTintColor: '#0ea5e9', // Primary blue
-              tabBarInactiveTintColor: '#737373', // Neutral gray
+              tabBarInactiveTintColor: isDarkMode ? '#a1a1aa' : '#737373', // Adaptive gray
               tabBarAccessibilityRole: 'tablist',
               tabBarStyle: {
-                backgroundColor: 'white',
-                borderTopColor: '#e5e5e5',
+                backgroundColor: isDarkMode ? '#18181b' : 'white',
+                borderTopColor: isDarkMode ? '#3f3f46' : '#e5e5e5',
                 paddingBottom: 12, // Increased for better touch targets
                 paddingTop: 8,
                 height: 88,
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: -2 },
-                shadowOpacity: 0.1,
+                shadowOpacity: isDarkMode ? 0.3 : 0.1,
                 shadowRadius: 4,
-                elevation: 8,
+                elevation: isDarkMode ? 12 : 8,
               },
               tabBarLabelStyle: {
                 fontSize: 12,
@@ -65,17 +68,17 @@ export default function TabLayout() {
                 paddingHorizontal: 4, // Added horizontal padding
               },
               headerStyle: {
-                backgroundColor: 'white',
+                backgroundColor: isDarkMode ? '#18181b' : 'white',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.1,
+                shadowOpacity: isDarkMode ? 0.2 : 0.1,
                 shadowRadius: 4,
-                elevation: 4,
+                elevation: isDarkMode ? 8 : 4,
               },
               headerTitleStyle: {
                 fontWeight: '600',
                 fontSize: 18,
-                color: '#171717',
+                color: isDarkMode ? '#fafafa' : '#171717',
               },
               headerTintColor: '#0ea5e9',
             })}
@@ -161,7 +164,7 @@ const QuickActionButton = () => {
         accessibilityRole="button"
         accessibilityLabel="Create new trip"
         accessibilityHint="Opens the trip creation form">
-        <Text className="font-medium text-primary-500">+ Trip</Text>
+        <Text className={`font-medium ${isDarkMode ? 'text-primary-400' : 'text-primary-500'}`}>+ Trip</Text>
       </Pressable>
     </Link>
   );
