@@ -1,0 +1,45 @@
+--- a/src/app/(app)/_layout.tsx
++++ b/src/app/(app)/_layout.tsx
+@@ -46,9 +46,9 @@
+               tabBarActiveTintColor: '#0ea5e9', // Primary blue
+               tabBarInactiveTintColor: '#737373', // Neutral gray
+               tabBarStyle: {
+                 backgroundColor: 'white',
+                 borderTopColor: '#e5e5e5',
+-                paddingBottom: 8,
++                paddingBottom: 12, // Increased for better touch targets
+                 paddingTop: 8,
+                 height: 88,
+                 shadowColor: '#000',
+@@ -59,8 +59,9 @@
+               },
+               tabBarLabelStyle: {
+                 fontSize: 12,
+                 fontWeight: '500',
+-                marginTop: 4,
++                marginTop: 6, // Increased spacing for better accessibility
++                paddingHorizontal: 4, // Added horizontal padding
+               },
+               headerStyle: {
+                 backgroundColor: 'white',
+@@ -134,10 +135,18 @@
+ const QuickActionButton = () => {
+   return (
+     <Link href="/(app)/trips/create" asChild>
+       <Pressable 
++        style={{
++          minHeight: 44, // iOS minimum touch target
++          minWidth: 44,
++          justifyContent: 'center',
++          alignItems: 'center',
++          paddingHorizontal: 12,
++          paddingVertical: 8,
++        }}
+         accessible={true}
+         accessibilityRole="button"
+         accessibilityLabel="Create new trip"
+         accessibilityHint="Opens the trip creation form">
+-        <Text className="px-3 font-medium text-primary-500">+ Trip</Text>
++        <Text className="font-medium text-primary-500">+ Trip</Text>
+       </Pressable>
+     </Link>
