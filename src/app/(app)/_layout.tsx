@@ -164,7 +164,7 @@ const QuickActionButton = () => {
         accessibilityRole="button"
         accessibilityLabel="Create new trip"
         accessibilityHint="Opens the trip creation form">
-        <Text className={`font-medium ${isDarkMode ? 'text-primary-400' : 'text-primary-500'}`}>+ Trip</Text>
+        <Text className="font-medium text-primary-500 dark:text-primary-400">+ Trip</Text>
       </Pressable>
     </Link>
   );
