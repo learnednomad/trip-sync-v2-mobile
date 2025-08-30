@@ -11,11 +11,7 @@ export function Flower({ color = '#000', ...props }: SvgProps) {
         stroke={color}
         strokeWidth={2}
       />
-      <Path
-        d="M2 12h20"
-        stroke={color}
-        strokeWidth={2}
-      />
+      <Path d="M2 12h20" stroke={color} strokeWidth={2} />
     </Svg>
   );
 }

@@ -7,8 +7,8 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import { Text } from '@/components/ui/text';
 import type { TripStatus } from '@/api/trips/types';
+import { Text } from '@/components/ui/text';
 
 interface TripStatusBadgeProps {
   status: TripStatus;
@@ -67,7 +67,11 @@ const sizeConfig = {
   },
 };
 
-export function TripStatusBadge({ status, size = 'md', className = '' }: TripStatusBadgeProps) {
+export function TripStatusBadge({
+  status,
+  size = 'md',
+  className = '',
+}: TripStatusBadgeProps) {
   const statusStyle = statusConfig[status];
   const sizeStyle = sizeConfig[size];
 
@@ -86,8 +90,8 @@ export function TripStatusBadge({ status, size = 'md', className = '' }: TripSta
         className={`
           ${statusStyle.textColor}
           ${sizeStyle.textSize}
-          font-medium
           text-center
+          font-medium
         `}
       >
         {statusStyle.label}

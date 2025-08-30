@@ -10,6 +10,7 @@ export type RealtimeEventType =
   | 'trip:participant_added'
   | 'trip:participant_removed'
   | 'trip:participant_updated'
+  | 'trip:activity'
   | 'itinerary:updated'
   | 'expense:added'
   | 'expense:updated'
@@ -19,6 +20,7 @@ export type RealtimeEventType =
   | 'document:removed'
   | 'user:online'
   | 'user:offline'
+  | 'user:presence_update'
   | 'typing:start'
   | 'typing:stop';
 

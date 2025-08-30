@@ -5,13 +5,14 @@
  */
 
 import React, { useState } from 'react';
-import { View, ScrollView } from 'react-native';
-import { MapPin, Calendar, Filter, X } from '@/components/ui/icons';
+import { ScrollView, View } from 'react-native';
 
-import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
+import { Calendar, Filter, MapPin, X } from '@/components/ui/icons';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { Text } from '@/components/ui/text';
+
 import { DatePicker } from './DatePicker';
 
 interface SearchFiltersProps {
@@ -53,59 +54,59 @@ const durationOptions = [
   { label: '2+ weeks', value: '15+' },
 ];
 
-export function SearchFilters({ 
-  searchQuery, 
-  onSearchChange, 
-  searchFilters, 
+export function SearchFilters({
+  searchQuery,
+  onSearchChange,
+  searchFilters,
   onSearchFiltersChange,
-  onClearSearchFilters 
+  onClearSearchFilters,
 }: SearchFiltersProps) {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   const hasActiveSearchFilters = Boolean(
     searchFilters.destination ||
-    searchFilters.startDateFrom ||
-    searchFilters.startDateTo ||
-    searchFilters.endDateFrom ||
-    searchFilters.endDateTo ||
-    searchFilters.tripType
+      searchFilters.startDateFrom ||
+      searchFilters.startDateTo ||
+      searchFilters.endDateFrom ||
+      searchFilters.endDateTo ||
+      searchFilters.tripType
   );
 
   const handleDurationChange = (value: string) => {
     if (!value) {
-      onSearchFiltersChange({ 
-        minDuration: undefined, 
-        maxDuration: undefined 
+      onSearchFiltersChange({
+        minDuration: undefined,
+        maxDuration: undefined,
       });
       return;
     }
 
     const [min, max] = value.split('-');
     if (max === '+') {
-      onSearchFiltersChange({ 
-        minDuration: parseInt(min), 
-        maxDuration: undefined 
+      onSearchFiltersChange({
+        minDuration: parseInt(min),
+        maxDuration: undefined,
       });
     } else {
-      onSearchFiltersChange({ 
-        minDuration: parseInt(min), 
-        maxDuration: parseInt(max) 
+      onSearchFiltersChange({
+        minDuration: parseInt(min),
+        maxDuration: parseInt(max),
       });
     }
   };
 
   const getCurrentDurationValue = () => {
     if (!searchFilters.minDuration) return '';
-    
+
     if (!searchFilters.maxDuration) {
       return `${searchFilters.minDuration}+`;
     }
-    
+
     return `${searchFilters.minDuration}-${searchFilters.maxDuration}`;
   };
 
   return (
-    <View className="bg-white border-b border-gray-100">
+    <View className="border-b border-gray-100 bg-white">
       {/* Main Search Bar */}
       <View className="px-4 py-3">
         <View className="flex-row items-center space-x-3">
@@ -117,17 +118,17 @@ export function SearchFilters({
               className="pr-10"
             />
           </View>
-          
+
           <Button
             variant={showAdvancedSearch ? 'default' : 'outline'}
             size="sm"
             onPress={() => setShowAdvancedSearch(!showAdvancedSearch)}
             className="px-3"
           >
-            <Filter 
-              width={16} 
-              height={16} 
-              color={showAdvancedSearch ? 'white' : '#6B7280'} 
+            <Filter
+              width={16}
+              height={16}
+              color={showAdvancedSearch ? 'white' : '#6B7280'}
             />
           </Button>
         </View>
@@ -144,9 +145,11 @@ export function SearchFilters({
 
       {/* Advanced Search Filters */}
       {showAdvancedSearch && (
-        <View className="px-4 pb-3 border-t border-gray-100">
-          <View className="flex-row items-center justify-between mb-3 mt-3">
-            <Text className="text-sm font-medium text-gray-700">Advanced Search</Text>
+        <View className="border-t border-gray-100 px-4 pb-3">
+          <View className="my-3 flex-row items-center justify-between">
+            <Text className="text-sm font-medium text-gray-700">
+              Advanced Search
+            </Text>
             {hasActiveSearchFilters && (
               <Button
                 variant="ghost"
@@ -155,7 +158,7 @@ export function SearchFilters({
                 className="flex-row items-center"
               >
                 <X width={14} height={14} color="#6B7280" />
-                <Text className="text-gray-600 ml-1 text-xs">Clear</Text>
+                <Text className="ml-1 text-xs text-gray-600">Clear</Text>
               </Button>
             )}
           </View>
@@ -164,25 +167,31 @@ export function SearchFilters({
             <View className="flex-row space-x-3 pb-2">
               {/* Destination Filter */}
               <View className="min-w-[160px]">
-                <Text className="text-xs font-medium text-gray-600 mb-1">
+                <Text className="mb-1 text-xs font-medium text-gray-600">
                   <MapPin width={12} height={12} color="#6B7280" /> Destination
                 </Text>
                 <Input
                   placeholder="Enter destination"
                   value={searchFilters.destination || ''}
-                  onChangeText={(value) => onSearchFiltersChange({ destination: value || undefined })}
+                  onChangeText={(value) =>
+                    onSearchFiltersChange({ destination: value || undefined })
+                  }
                   className="text-sm"
                 />
               </View>
 
               {/* Trip Type Filter */}
               <View className="min-w-[140px]">
-                <Text className="text-xs font-medium text-gray-600 mb-1">Trip Type</Text>
+                <Text className="mb-1 text-xs font-medium text-gray-600">
+                  Trip Type
+                </Text>
                 <Select
                   value={searchFilters.tripType || ''}
-                  onSelect={(value) => onSearchFiltersChange({ 
-                    tripType: value || undefined 
-                  })}
+                  onSelect={(value: string | number) =>
+                    onSearchFiltersChange({
+                      tripType: String(value) || undefined,
+                    })
+                  }
                   options={tripTypeOptions}
                   placeholder="All Types"
                 />
@@ -190,36 +199,33 @@ export function SearchFilters({
 
               {/* Duration Filter */}
               <View className="min-w-[140px]">
-                <Text className="text-xs font-medium text-gray-600 mb-1">Duration</Text>
+                <Text className="mb-1 text-xs font-medium text-gray-600">
+                  Duration
+                </Text>
                 <Select
                   value={getCurrentDurationValue()}
-                  onSelect={handleDurationChange}
+                  onSelect={(value: string | number) =>
+                    handleDurationChange(String(value))
+                  }
                   options={durationOptions}
                   placeholder="Any Duration"
                 />
               </View>
 
-              {/* Start Date Range */}
+              {/* Date Range Filter */}
               <View className="min-w-[140px]">
-                <Text className="text-xs font-medium text-gray-600 mb-1">
-                  <Calendar width={12} height={12} color="#6B7280" /> Start Date From
+                <Text className="mb-1 text-xs font-medium text-gray-600">
+                  <Calendar width={12} height={12} color="#6B7280" /> Date Range
                 </Text>
                 <DatePicker
-                  date={searchFilters.startDateFrom}
-                  onDateChange={(date) => onSearchFiltersChange({ startDateFrom: date })}
-                  placeholder="From date"
-                  mode="date"
-                />
-              </View>
-
-              <View className="min-w-[140px]">
-                <Text className="text-xs font-medium text-gray-600 mb-1">Start Date To</Text>
-                <DatePicker
-                  date={searchFilters.startDateTo}
-                  onDateChange={(date) => onSearchFiltersChange({ startDateTo: date })}
-                  placeholder="To date"
-                  mode="date"
-                  minimumDate={searchFilters.startDateFrom}
+                  startDate={searchFilters.startDateFrom}
+                  endDate={searchFilters.startDateTo}
+                  onStartDateChange={(date: string) =>
+                    onSearchFiltersChange({ startDateFrom: date })
+                  }
+                  onEndDateChange={(date: string) =>
+                    onSearchFiltersChange({ startDateTo: date })
+                  }
                 />
               </View>
             </View>
@@ -229,34 +235,45 @@ export function SearchFilters({
           {hasActiveSearchFilters && (
             <View className="mt-3 flex-row flex-wrap">
               {searchFilters.destination && (
-                <View className="bg-blue-50 px-2 py-1 rounded-full mr-2 mb-1 flex-row items-center">
+                <View className="mb-1 mr-2 flex-row items-center rounded-full bg-blue-50 px-2 py-1">
                   <MapPin width={10} height={10} color="#1D4ED8" />
-                  <Text className="text-blue-700 text-xs ml-1">{searchFilters.destination}</Text>
+                  <Text className="ml-1 text-xs text-blue-700">
+                    {searchFilters.destination}
+                  </Text>
                 </View>
               )}
-              
+
               {searchFilters.tripType && (
-                <View className="bg-green-50 px-2 py-1 rounded-full mr-2 mb-1">
-                  <Text className="text-green-700 text-xs">
-                    {tripTypeOptions.find(opt => opt.value === searchFilters.tripType)?.label}
+                <View className="mb-1 mr-2 rounded-full bg-green-50 px-2 py-1">
+                  <Text className="text-xs text-green-700">
+                    {
+                      tripTypeOptions.find(
+                        (opt) => opt.value === searchFilters.tripType
+                      )?.label
+                    }
                   </Text>
                 </View>
               )}
-              
+
               {(searchFilters.minDuration || searchFilters.maxDuration) && (
-                <View className="bg-purple-50 px-2 py-1 rounded-full mr-2 mb-1 flex-row items-center">
+                <View className="mb-1 mr-2 flex-row items-center rounded-full bg-purple-50 px-2 py-1">
                   <Calendar width={10} height={10} color="#7C3AED" />
-                  <Text className="text-purple-700 text-xs ml-1">
-                    {searchFilters.minDuration && !searchFilters.maxDuration && `${searchFilters.minDuration}+ days`}
-                    {searchFilters.minDuration && searchFilters.maxDuration && `${searchFilters.minDuration}-${searchFilters.maxDuration} days`}
+                  <Text className="ml-1 text-xs text-purple-700">
+                    {searchFilters.minDuration &&
+                      !searchFilters.maxDuration &&
+                      `${searchFilters.minDuration}+ days`}
+                    {searchFilters.minDuration &&
+                      searchFilters.maxDuration &&
+                      `${searchFilters.minDuration}-${searchFilters.maxDuration} days`}
                   </Text>
                 </View>
               )}
-              
+
               {(searchFilters.startDateFrom || searchFilters.startDateTo) && (
-                <View className="bg-orange-50 px-2 py-1 rounded-full mr-2 mb-1">
-                  <Text className="text-orange-700 text-xs">
-                    Start: {searchFilters.startDateFrom} - {searchFilters.startDateTo || 'any'}
+                <View className="mb-1 mr-2 rounded-full bg-orange-50 px-2 py-1">
+                  <Text className="text-xs text-orange-700">
+                    Start: {searchFilters.startDateFrom} -{' '}
+                    {searchFilters.startDateTo || 'any'}
                   </Text>
                 </View>
               )}

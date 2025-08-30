@@ -7,7 +7,11 @@ interface MailProps {
   color?: string;
 }
 
-export function Mail({ width = 24, height = 24, color = 'currentColor' }: MailProps) {
+export function Mail({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: MailProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

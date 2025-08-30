@@ -5,13 +5,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 export function Clock({ color = '#000', ...props }: SvgProps) {
   return (
     <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" {...props}>
-      <Circle
-        cx={12}
-        cy={12}
-        r={10}
-        stroke={color}
-        strokeWidth={2}
-      />
+      <Circle cx={12} cy={12} r={10} stroke={color} strokeWidth={2} />
       <Path
         d="M12 6v6l4 2"
         stroke={color}

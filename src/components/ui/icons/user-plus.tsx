@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 interface UserPlusProps {
   width?: number;
@@ -7,7 +7,11 @@ interface UserPlusProps {
   color?: string;
 }
 
-export function UserPlus({ width = 24, height = 24, color = 'currentColor' }: UserPlusProps) {
+export function UserPlus({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: UserPlusProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

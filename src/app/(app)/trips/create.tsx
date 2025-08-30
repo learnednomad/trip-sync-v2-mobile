@@ -4,38 +4,26 @@
  * Acceptance Criteria: Trip Creation with comprehensive details
  */
 
-import React, { useState, useCallback } from 'react';
-import { View, ScrollView, Alert } from 'react-native';
-import { router, Stack } from 'expo-router';
-import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { router, Stack } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Alert, ScrollView, View } from 'react-native';
 import { z } from 'zod';
-import {
-  Calendar,
-  MapPin,
-  Users,
-  BookOpen,
-  DollarSign,
-  Lock,
-  Globe,
-  Type,
-} from '@/components/ui/icons';
 
-import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ImagePicker } from '@/components/ui/image-picker';
-import { LocationSearch } from '@/components/trips/LocationSearch';
-import { DatePicker } from '@/components/trips/DatePicker';
-import {
-  TripTypeSelector,
-  type TripType,
-} from '@/components/trips/TripTypeSelector';
-import { LoadingOverlay } from '@/components/ui/loading-overlay';
+import type { CreateTripRequest } from '@/api/trips/types';
 import { useCreateTrip } from '@/api/trips/use-trips';
-import type { CreateTripRequest, TripSettings } from '@/api/trips/types';
+import { DatePicker } from '@/components/trips/DatePicker';
+import { LocationSearch } from '@/components/trips/LocationSearch';
+import { TripTypeSelector } from '@/components/trips/TripTypeSelector';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { BookOpen, Calendar, DollarSign } from '@/components/ui/icons';
+import { ImagePicker } from '@/components/ui/image-picker';
+import { Input } from '@/components/ui/input';
+import { LoadingOverlay } from '@/components/ui/loading-overlay';
+import { Select } from '@/components/ui/select';
+import { Text } from '@/components/ui/text';
 
 // Form validation schema
 const createTripSchema = z
@@ -149,6 +137,7 @@ export default function CreateTripScreen() {
           name: data.name,
           description: data.description,
           destination: data.destination,
+          tripType: data.tripType || 'LEISURE',
           startDate: data.startDate,
           endDate: data.endDate,
           coverImageUrl: data.coverImageUrl,
@@ -192,7 +181,7 @@ export default function CreateTripScreen() {
     <View className="space-y-6">
       {/* Trip Name */}
       <View>
-        <Text className="text-sm font-medium text-gray-700 mb-2">
+        <Text className="mb-2 text-sm font-medium text-gray-700">
           Trip Name *
         </Text>
         <Controller
@@ -211,7 +200,7 @@ export default function CreateTripScreen() {
 
       {/* Description */}
       <View>
-        <Text className="text-sm font-medium text-gray-700 mb-2">
+        <Text className="mb-2 text-sm font-medium text-gray-700">
           Description
         </Text>
         <Controller
@@ -232,7 +221,7 @@ export default function CreateTripScreen() {
 
       {/* Destination */}
       <View>
-        <Text className="text-sm font-medium text-gray-700 mb-2">
+        <Text className="mb-2 text-sm font-medium text-gray-700">
           Destination *
         </Text>
         <Controller
@@ -251,7 +240,7 @@ export default function CreateTripScreen() {
 
       {/* Cover Image */}
       <View>
-        <Text className="text-sm font-medium text-gray-700 mb-2">
+        <Text className="mb-2 text-sm font-medium text-gray-700">
           Cover Image
         </Text>
         <Controller
@@ -273,7 +262,7 @@ export default function CreateTripScreen() {
     <View className="space-y-6">
       {/* Trip Type */}
       <View>
-        <Text className="text-sm font-medium text-gray-700 mb-2">
+        <Text className="mb-2 text-sm font-medium text-gray-700">
           Trip Type *
         </Text>
         <Controller
@@ -319,7 +308,7 @@ export default function CreateTripScreen() {
 
       {/* Privacy Settings */}
       <View>
-        <Text className="text-sm font-medium text-gray-700 mb-2">Privacy</Text>
+        <Text className="mb-2 text-sm font-medium text-gray-700">Privacy</Text>
         <Controller
           control={control}
           name="privacy"
@@ -352,7 +341,7 @@ export default function CreateTripScreen() {
     <View className="space-y-6">
       {/* Budget */}
       <View>
-        <Text className="text-sm font-medium text-gray-700 mb-2">
+        <Text className="mb-2 text-sm font-medium text-gray-700">
           Budget (Optional)
         </Text>
         <View className="flex-row space-x-3">
@@ -392,10 +381,10 @@ export default function CreateTripScreen() {
       {/* Participant Emails */}
       {watchedPrivacy !== 'private' && (
         <View>
-          <Text className="text-sm font-medium text-gray-700 mb-2">
+          <Text className="mb-2 text-sm font-medium text-gray-700">
             Invite People (Optional)
           </Text>
-          <Text className="text-xs text-gray-500 mb-3">
+          <Text className="mb-3 text-xs text-gray-500">
             You can also invite people after creating the trip
           </Text>
           <Controller
@@ -432,7 +421,7 @@ export default function CreateTripScreen() {
 
       {/* Advanced Settings */}
       {showAdvancedSettings && (
-        <View className="space-y-4 p-4 bg-gray-50 rounded-lg">
+        <View className="space-y-4 rounded-lg bg-gray-50 p-4">
           <Text className="text-sm font-medium text-gray-700">Permissions</Text>
 
           <View className="space-y-3">
@@ -471,7 +460,7 @@ export default function CreateTripScreen() {
             />
           </View>
 
-          <Text className="text-sm font-medium text-gray-700 mt-4">
+          <Text className="mt-4 text-sm font-medium text-gray-700">
             Notifications
           </Text>
 
@@ -556,8 +545,8 @@ export default function CreateTripScreen() {
 
       <View className="flex-1 bg-white">
         {/* Progress Steps */}
-        <View className="px-4 py-6 border-b border-gray-100">
-          <View className="flex-row justify-between mb-4">
+        <View className="border-b border-gray-100 px-4 py-6">
+          <View className="mb-4 flex-row justify-between">
             {steps.map((step, index) => {
               const StepIcon = step.icon;
               const isActive = index === currentStep;
@@ -566,7 +555,7 @@ export default function CreateTripScreen() {
               return (
                 <View key={index} className="flex-1 items-center">
                   <View
-                    className={`w-8 h-8 rounded-full items-center justify-center mb-2 ${
+                    className={`mb-2 size-8 items-center justify-center rounded-full ${
                       isActive
                         ? 'bg-blue-600'
                         : isCompleted
@@ -581,8 +570,8 @@ export default function CreateTripScreen() {
                     />
                   </View>
                   <Text
-                    className={`text-xs text-center ${
-                      isActive ? 'text-blue-600 font-medium' : 'text-gray-500'
+                    className={`text-center text-xs ${
+                      isActive ? 'font-medium text-blue-600' : 'text-gray-500'
                     }`}
                   >
                     {step.title}
@@ -593,7 +582,7 @@ export default function CreateTripScreen() {
           </View>
 
           {/* Progress Bar */}
-          <View className="h-1 bg-gray-200 rounded-full overflow-hidden">
+          <View className="h-1 overflow-hidden rounded-full bg-gray-200">
             <View
               className="h-full bg-blue-600 transition-all duration-300"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
@@ -607,7 +596,7 @@ export default function CreateTripScreen() {
         </ScrollView>
 
         {/* Navigation Buttons */}
-        <View className="px-4 py-6 border-t border-gray-100">
+        <View className="border-t border-gray-100 px-4 py-6">
           <View className="flex-row space-x-3">
             {currentStep > 0 && (
               <Button
@@ -615,7 +604,7 @@ export default function CreateTripScreen() {
                 onPress={handlePrevious}
                 className="flex-1"
               >
-                <Text className="text-gray-700 font-medium">Previous</Text>
+                <Text className="font-medium text-gray-700">Previous</Text>
               </Button>
             )}
 
@@ -625,7 +614,7 @@ export default function CreateTripScreen() {
                 disabled={!canProceed()}
                 className={`flex-1 ${!canProceed() ? 'bg-gray-300' : 'bg-blue-600'}`}
               >
-                <Text className="text-white font-medium">Next</Text>
+                <Text className="font-medium text-white">Next</Text>
               </Button>
             ) : (
               <Button
@@ -637,7 +626,7 @@ export default function CreateTripScreen() {
                     : 'bg-green-600'
                 }`}
               >
-                <Text className="text-white font-medium">
+                <Text className="font-medium text-white">
                   {createTripMutation.isPending ? 'Creating...' : 'Create Trip'}
                 </Text>
               </Button>

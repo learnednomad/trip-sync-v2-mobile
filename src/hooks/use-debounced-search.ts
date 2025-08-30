@@ -4,7 +4,7 @@
  * Performance-optimized search with debouncing
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface UseSearchDebounceOptions {
   delay?: number;
@@ -16,14 +16,14 @@ export function useSearchDebounce(
   options: UseSearchDebounceOptions = {}
 ) {
   const { delay = 300, minLength = 2 } = options;
-  
+
   const [searchTerm, setSearchTerm] = useState(initialValue);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(initialValue);
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     setIsSearching(true);
-    
+
     const handler = setTimeout(() => {
       if (searchTerm.length >= minLength || searchTerm.length === 0) {
         setDebouncedSearchTerm(searchTerm);

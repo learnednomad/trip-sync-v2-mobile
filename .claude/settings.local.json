@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "mcp__mcp-server-firecrawl__firecrawl_scrape"
+      "mcp__mcp-server-firecrawl__firecrawl_scrape",
+      "Bash(eas:*)"
     ],
     "deny": [],
     "ask": []

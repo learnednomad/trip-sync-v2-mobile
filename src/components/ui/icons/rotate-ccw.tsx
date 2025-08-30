@@ -7,7 +7,11 @@ interface RotateCcwProps {
   color?: string;
 }
 
-export function RotateCcw({ width = 24, height = 24, color = 'currentColor' }: RotateCcwProps) {
+export function RotateCcw({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: RotateCcwProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

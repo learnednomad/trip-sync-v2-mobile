@@ -4,14 +4,20 @@
  * Tests the main trip management screen functionality
  */
 
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react-native';
 import { router } from 'expo-router';
+import React from 'react';
 
-import TripsScreen from '../index';
 import { useTrips } from '@/api/trips/use-trips';
 import { useSearchDebounce } from '@/hooks/use-debounced-search';
+
+import TripsScreen from '../index';
 
 // Mock dependencies
 jest.mock('expo-router', () => ({
@@ -24,7 +30,9 @@ jest.mock('@/api/trips/use-trips');
 jest.mock('@/hooks/use-debounced-search');
 
 const mockUseTrips = useTrips as jest.MockedFunction<typeof useTrips>;
-const mockUseSearchDebounce = useSearchDebounce as jest.MockedFunction<typeof useSearchDebounce>;
+const mockUseSearchDebounce = useSearchDebounce as jest.MockedFunction<
+  typeof useSearchDebounce
+>;
 
 const mockTripsData = {
   data: {
@@ -57,6 +65,7 @@ const mockTripsData = {
           },
         },
         ownerId: 'user-1',
+        version: 1,
         createdAt: '2024-01-15T10:00:00Z',
         updatedAt: '2024-01-15T10:00:00Z',
       },
@@ -87,10 +96,13 @@ const mockTripsData = {
           },
         },
         ownerId: 'user-1',
+        version: 1,
         createdAt: '2024-01-10T10:00:00Z',
         updatedAt: '2024-01-10T10:00:00Z',
       },
     ],
+    total: 2,
+    hasMore: false,
   },
 };
 
@@ -113,17 +125,18 @@ describe('TripsScreen - Trip Dashboard', () => {
       debouncedSearchTerm: '',
       isSearching: false,
       setSearchTerm: jest.fn(),
+      setSearchTermImmediate: jest.fn(),
       clearSearch: jest.fn(),
     });
 
     mockUseTrips.mockReturnValue({
-      data: mockTripsData,
+      data: { ...mockTripsData, success: true },
       isLoading: false,
       isError: false,
       error: null,
       refetch: jest.fn(),
       isFetching: false,
-    });
+    } as any);
   });
 
   const renderWithQueryClient = (component: React.ReactElement) => {
@@ -137,14 +150,14 @@ describe('TripsScreen - Trip Dashboard', () => {
   describe('Dashboard Layout', () => {
     it('should render trips dashboard header', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       expect(screen.getByText('My Trips')).toBeTruthy();
       expect(screen.getByText('Create Trip')).toBeTruthy();
     });
 
     it('should render view mode toggle buttons', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       // Grid and List view toggle buttons should be present
       const viewToggle = screen.getByTestId('view-mode-toggle');
       expect(viewToggle).toBeTruthy();
@@ -152,7 +165,7 @@ describe('TripsScreen - Trip Dashboard', () => {
 
     it('should show filter toggle button', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       expect(screen.getByText('Show Filters')).toBeTruthy();
     });
   });
@@ -160,55 +173,59 @@ describe('TripsScreen - Trip Dashboard', () => {
   describe('Trip List Display', () => {
     it('should display trip cards when trips are available', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       expect(screen.getByText('European Adventure')).toBeTruthy();
       expect(screen.getByText('Business Conference NYC')).toBeTruthy();
     });
 
     it('should show empty state when no trips exist', () => {
       mockUseTrips.mockReturnValue({
-        data: { data: { trips: [] } },
+        data: { success: true, data: { trips: [], total: 0, hasMore: false } },
         isLoading: false,
         isError: false,
         error: null,
         refetch: jest.fn(),
         isFetching: false,
-      });
+      } as any);
 
       renderWithQueryClient(<TripsScreen />);
-      
+
       expect(screen.getByText('No Trips Yet')).toBeTruthy();
-      expect(screen.getByText('Create your first trip to start planning your next adventure.')).toBeTruthy();
+      expect(
+        screen.getByText(
+          'Create your first trip to start planning your next adventure.'
+        )
+      ).toBeTruthy();
     });
 
     it('should handle loading state', () => {
       mockUseTrips.mockReturnValue({
-        data: null,
+        data: undefined,
         isLoading: true,
         isError: false,
         error: null,
         refetch: jest.fn(),
         isFetching: false,
-      });
+      } as any);
 
       renderWithQueryClient(<TripsScreen />);
-      
+
       // Should show loading skeletons
       expect(screen.getByTestId('loading-skeleton')).toBeTruthy();
     });
 
     it('should handle error state', () => {
       mockUseTrips.mockReturnValue({
-        data: null,
+        data: undefined,
         isLoading: false,
         isError: true,
         error: new Error('Network error'),
         refetch: jest.fn(),
         isFetching: false,
-      });
+      } as any);
 
       renderWithQueryClient(<TripsScreen />);
-      
+
       expect(screen.getByText('Failed to Load Trips')).toBeTruthy();
       expect(screen.getByText('Try Again')).toBeTruthy();
     });
@@ -217,19 +234,19 @@ describe('TripsScreen - Trip Dashboard', () => {
   describe('Navigation Actions', () => {
     it('should navigate to create trip screen when create button is pressed', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       const createButton = screen.getByText('Create Trip');
       fireEvent.press(createButton);
-      
+
       expect(router.push).toHaveBeenCalledWith('/trips/create');
     });
 
     it('should navigate to trip details when trip card is pressed', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       const tripCard = screen.getByText('European Adventure');
       fireEvent.press(tripCard);
-      
+
       expect(router.push).toHaveBeenCalledWith('/trips/trip-1');
     });
   });
@@ -237,7 +254,7 @@ describe('TripsScreen - Trip Dashboard', () => {
   describe('Search and Filter Integration', () => {
     it('should show search functionality', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       expect(screen.getByPlaceholderText('Search trips...')).toBeTruthy();
     });
 
@@ -248,14 +265,15 @@ describe('TripsScreen - Trip Dashboard', () => {
         debouncedSearchTerm: '',
         isSearching: false,
         setSearchTerm: mockSetSearchTerm,
+        setSearchTermImmediate: jest.fn(),
         clearSearch: jest.fn(),
       });
 
       renderWithQueryClient(<TripsScreen />);
-      
+
       const searchInput = screen.getByPlaceholderText('Search trips...');
       fireEvent.changeText(searchInput, 'Paris');
-      
+
       expect(mockSetSearchTerm).toHaveBeenCalledWith('Paris');
     });
 
@@ -265,20 +283,21 @@ describe('TripsScreen - Trip Dashboard', () => {
         debouncedSearchTerm: 'Paris',
         isSearching: true,
         setSearchTerm: jest.fn(),
+        setSearchTermImmediate: jest.fn(),
         clearSearch: jest.fn(),
       });
 
       renderWithQueryClient(<TripsScreen />);
-      
+
       expect(screen.getByText('Searching...')).toBeTruthy();
     });
 
     it('should toggle filters panel', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       const filterToggle = screen.getByText('Show Filters');
       fireEvent.press(filterToggle);
-      
+
       expect(screen.getByText('Hide Filters')).toBeTruthy();
     });
   });
@@ -286,17 +305,17 @@ describe('TripsScreen - Trip Dashboard', () => {
   describe('Quick Actions Integration', () => {
     it('should show quick actions component', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       // Quick actions should be rendered
       expect(screen.getByTestId('quick-actions')).toBeTruthy();
     });
 
     it('should handle template selection modal', async () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       const templatesButton = screen.getByText('From Template');
       fireEvent.press(templatesButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText('Trip Templates')).toBeTruthy();
       });
@@ -304,10 +323,10 @@ describe('TripsScreen - Trip Dashboard', () => {
 
     it('should handle quick plan modal', async () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       const quickPlanButton = screen.getByText('Quick Plan');
       fireEvent.press(quickPlanButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText('Quick Trip Planning')).toBeTruthy();
       });
@@ -318,19 +337,19 @@ describe('TripsScreen - Trip Dashboard', () => {
     it('should handle pull to refresh', () => {
       const mockRefetch = jest.fn();
       mockUseTrips.mockReturnValue({
-        data: mockTripsData,
+        data: { ...mockTripsData, success: true },
         isLoading: false,
         isError: false,
         error: null,
         refetch: mockRefetch,
         isFetching: false,
-      });
+      } as any);
 
       renderWithQueryClient(<TripsScreen />);
-      
+
       const scrollView = screen.getByTestId('trips-scroll-view');
       fireEvent(scrollView, 'refresh');
-      
+
       expect(mockRefetch).toHaveBeenCalled();
     });
   });
@@ -338,7 +357,7 @@ describe('TripsScreen - Trip Dashboard', () => {
   describe('Accessibility', () => {
     it('should have proper accessibility labels', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       const createButton = screen.getByText('Create Trip');
       expect(createButton.props.accessibilityRole).toBe('button');
       expect(createButton.props.accessibilityLabel).toBe('Create new trip');
@@ -346,7 +365,7 @@ describe('TripsScreen - Trip Dashboard', () => {
 
     it('should support screen readers', () => {
       renderWithQueryClient(<TripsScreen />);
-      
+
       // Trip cards should have proper accessibility
       const tripCard = screen.getByLabelText(/Trip: European Adventure/);
       expect(tripCard).toBeTruthy();

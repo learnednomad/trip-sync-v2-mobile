@@ -7,7 +7,11 @@ interface LinkProps {
   color?: string;
 }
 
-export function Link({ width = 24, height = 24, color = 'currentColor' }: LinkProps) {
+export function Link({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: LinkProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

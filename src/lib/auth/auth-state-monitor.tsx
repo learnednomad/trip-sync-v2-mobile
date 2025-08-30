@@ -18,29 +18,35 @@ interface AuthStateInfo {
   lastChecked: string;
 }
 
-export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const authState = useAuth();
   const [stateInfo, setStateInfo] = React.useState<AuthStateInfo | null>(null);
-  const [initializationComplete, setInitializationComplete] = React.useState(false);
-  
+  const [initializationComplete, setInitializationComplete] =
+    React.useState(false);
+
   // Monitor auth state changes
   React.useEffect(() => {
     const updateStateInfo = () => {
       const storageToken = getToken();
       const storeToken = authState.token;
-      
+
       const info: AuthStateInfo = {
         storeStatus: authState.status,
         storeHasToken: !!storeToken,
         storageHasToken: !!storageToken,
-        tokensMatch: !!storageToken && !!storeToken && storageToken.access === storeToken.access,
+        tokensMatch:
+          !!storageToken &&
+          !!storeToken &&
+          storageToken.access === storeToken.access,
         accessTokenLength: storageToken?.access?.length || 0,
         refreshTokenLength: storageToken?.refresh?.length || 0,
         lastChecked: new Date().toISOString(),
       };
-      
+
       setStateInfo(info);
-      
+
       if (__DEV__) {
         console.log('🔍 Auth State Monitor Update:', {
           status: info.storeStatus,
@@ -50,28 +56,34 @@ export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({ chil
           accessLength: info.accessTokenLength,
           refreshLength: info.refreshTokenLength,
         });
-        
+
         // Check for potential issues
         if (info.storeHasToken && !info.storageHasToken) {
-          console.warn('⚠️  Store has token but storage doesn\'t - storage may have been cleared');
+          console.warn(
+            "⚠️  Store has token but storage doesn't - storage may have been cleared"
+          );
         }
-        
+
         if (info.storageHasToken && !info.storeHasToken) {
-          console.warn('⚠️  Storage has token but store doesn\'t - hydration may have failed');
+          console.warn(
+            "⚠️  Storage has token but store doesn't - hydration may have failed"
+          );
         }
-        
+
         if (info.storeHasToken && info.storageHasToken && !info.tokensMatch) {
-          console.warn('⚠️  Tokens exist in both places but don\'t match - sync issue detected');
+          console.warn(
+            "⚠️  Tokens exist in both places but don't match - sync issue detected"
+          );
         }
       }
     };
-    
+
     // Initial check
     updateStateInfo();
-    
+
     // Set up periodic monitoring
     const interval = setInterval(updateStateInfo, 5000); // Check every 5 seconds
-    
+
     return () => clearInterval(interval);
   }, [authState.status, authState.token]);
 
@@ -80,9 +92,9 @@ export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({ chil
     // Consider initialization complete when:
     // 1. Status is not 'idle' (hydration has run)
     // 2. Store and storage are in sync
-    const isComplete = authState.status !== 'idle' && 
-                      stateInfo?.tokensMatch !== false; // not false (could be true or null)
-    
+    const isComplete =
+      authState.status !== 'idle' && stateInfo?.tokensMatch !== false; // not false (could be true or null)
+
     if (!initializationComplete && isComplete) {
       setInitializationComplete(true);
       if (__DEV__) {
@@ -90,7 +102,9 @@ export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({ chil
         console.log('Final state:', {
           status: authState.status,
           authenticated: authState.status === 'signIn',
-          hasValidTokens: !!(stateInfo?.storeHasToken && stateInfo?.storageHasToken),
+          hasValidTokens: !!(
+            stateInfo?.storeHasToken && stateInfo?.storageHasToken
+          ),
         });
       }
     }
@@ -100,13 +114,19 @@ export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({ chil
   React.useEffect(() => {
     if (stateInfo && initializationComplete) {
       // Warn about potential authentication issues
-      if (authState.status === 'signIn' && (!stateInfo.storeHasToken || !stateInfo.storageHasToken)) {
+      if (
+        authState.status === 'signIn' &&
+        (!stateInfo.storeHasToken || !stateInfo.storageHasToken)
+      ) {
         console.error('🚨 Authentication inconsistency detected:');
         console.error('  - Status says signed in but tokens are missing');
         console.error('  - This will cause 401 errors on API calls');
       }
-      
-      if (authState.status === 'signOut' && (stateInfo.storeHasToken || stateInfo.storageHasToken)) {
+
+      if (
+        authState.status === 'signOut' &&
+        (stateInfo.storeHasToken || stateInfo.storageHasToken)
+      ) {
         console.warn('⚠️  Status says signed out but tokens still exist');
         console.warn('  - This could indicate incomplete sign out process');
       }
@@ -118,11 +138,13 @@ export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({ chil
     if (__DEV__) {
       console.log('⏳ Authentication initializing...', {
         status: authState.status,
-        stateInfo: stateInfo ? {
-          storeToken: stateInfo.storeHasToken,
-          storageToken: stateInfo.storageHasToken,
-          tokensMatch: stateInfo.tokensMatch,
-        } : null,
+        stateInfo: stateInfo
+          ? {
+              storeToken: stateInfo.storeHasToken,
+              storageToken: stateInfo.storageHasToken,
+              tokensMatch: stateInfo.tokensMatch,
+            }
+          : null,
       });
     }
   }
@@ -130,35 +152,40 @@ export const AuthStateMonitor: React.FC<{ children: React.ReactNode }> = ({ chil
   return (
     <>
       {children}
-      {__DEV__ && stateInfo && (
-        <AuthDebugInfo stateInfo={stateInfo} />
-      )}
+      {__DEV__ && stateInfo && <AuthDebugInfo stateInfo={stateInfo} />}
     </>
   );
 };
 
 // Development-only debug info overlay
-const AuthDebugInfo: React.FC<{ stateInfo: AuthStateInfo }> = ({ stateInfo }) => {
+const AuthDebugInfo: React.FC<{ stateInfo: AuthStateInfo }> = ({
+  stateInfo,
+}) => {
   const [showDebug, setShowDebug] = React.useState(false);
-  
+
   if (!__DEV__ || !showDebug) {
     return null;
   }
-  
+
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      right: 0,
-      backgroundColor: 'rgba(0,0,0,0.8)',
-      color: 'white',
-      padding: '8px',
-      fontSize: '10px',
-      fontFamily: 'monospace',
-      zIndex: 9999,
-      maxWidth: '200px',
-    }}>
-      <div onClick={() => setShowDebug(false)} style={{ cursor: 'pointer', textAlign: 'right' }}>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        color: 'white',
+        padding: '8px',
+        fontSize: '10px',
+        fontFamily: 'monospace',
+        zIndex: 9999,
+        maxWidth: '200px',
+      }}
+    >
+      <div
+        onClick={() => setShowDebug(false)}
+        style={{ cursor: 'pointer', textAlign: 'right' }}
+      >
         ✕
       </div>
       <div>Status: {stateInfo.storeStatus}</div>
@@ -180,31 +207,36 @@ const AuthDebugInfo: React.FC<{ stateInfo: AuthStateInfo }> = ({ stateInfo }) =>
 export const useAuthInitialization = () => {
   const authState = useAuth();
   const [isInitialized, setIsInitialized] = React.useState(false);
-  
+
   React.useEffect(() => {
     const checkInitialization = () => {
       const storageToken = getToken();
       const storeToken = authState.token;
-      
+
       // Consider initialized when:
       // 1. Status is not 'idle'
       // 2. If tokens exist, they should be in sync
       const statusInitialized = authState.status !== 'idle';
-      const tokensInSync = !storageToken || !storeToken || storageToken.access === storeToken.access;
-      
+      const tokensInSync =
+        !storageToken ||
+        !storeToken ||
+        storageToken.access === storeToken.access;
+
       const initialized = statusInitialized && tokensInSync;
-      
+
       if (initialized !== isInitialized) {
         setIsInitialized(initialized);
         if (__DEV__ && initialized) {
-          console.log('✅ useAuthInitialization: Authentication initialization complete');
+          console.log(
+            '✅ useAuthInitialization: Authentication initialization complete'
+          );
         }
       }
     };
-    
+
     checkInitialization();
   }, [authState.status, authState.token, isInitialized]);
-  
+
   return {
     isInitialized,
     authStatus: authState.status,

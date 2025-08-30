@@ -13,8 +13,8 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { APIProvider } from '@/api';
 import { hydrateAuth, loadSelectedTheme } from '@/lib';
-import { useThemeConfig } from '@/lib/use-theme-config';
 import { AuthStateMonitor } from '@/lib/auth/auth-state-monitor';
+import { useThemeConfig } from '@/lib/use-theme-config';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -37,8 +37,10 @@ export default function RootLayout() {
     <Providers>
       <Stack>
         <Stack.Screen name="(app)" options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="feed/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="feed/add-post" options={{ headerShown: false }} />
+        <Stack.Screen name="[...messing]" options={{ headerShown: false }} />
       </Stack>
     </Providers>
   );

@@ -29,7 +29,11 @@ export type LoginFormProps = {
   error?: Error | null;
 };
 
-export const LoginForm = ({ onSubmit = () => {}, isLoading = false, error }: LoginFormProps) => {
+export const LoginForm = ({
+  onSubmit = () => {},
+  isLoading = false,
+  error,
+}: LoginFormProps) => {
   const { handleSubmit, control } = useForm<FormType>({
     resolver: zodResolver(schema),
   });
@@ -84,7 +88,7 @@ export const LoginForm = ({ onSubmit = () => {}, isLoading = false, error }: Log
         />
         <Button
           testID="login-button"
-          label={isLoading ? "Signing in..." : "Login"}
+          label={isLoading ? 'Signing in...' : 'Login'}
           onPress={handleSubmit(onSubmit)}
           disabled={isLoading}
         />

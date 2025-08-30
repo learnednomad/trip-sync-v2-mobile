@@ -4,12 +4,12 @@
  * Autocomplete location search input
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { View, TextInput, FlatList, Pressable } from 'react-native';
-import { MapPin, Search, X } from '@/components/ui/icons';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, Pressable, TextInput, View } from 'react-native';
 
-import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
+import { MapPin, Search, X } from '@/components/ui/icons';
+import { Text } from '@/components/ui/text';
 
 interface LocationSuggestion {
   id: string;
@@ -39,7 +39,7 @@ const mockSuggestions: LocationSuggestion[] = [
     name: 'New York',
     country: 'United States',
     region: 'New York',
-    coordinates: { lat: 40.7128, lng: -74.0060 },
+    coordinates: { lat: 40.7128, lng: -74.006 },
     type: 'city',
   },
   {
@@ -92,10 +92,11 @@ export function LocationSearch({
   useEffect(() => {
     if (value.length >= 2) {
       // Simulate API call with mock data
-      const filtered = mockSuggestions.filter(location =>
-        location.name.toLowerCase().includes(value.toLowerCase()) ||
-        location.country.toLowerCase().includes(value.toLowerCase()) ||
-        location.region?.toLowerCase().includes(value.toLowerCase())
+      const filtered = mockSuggestions.filter(
+        (location) =>
+          location.name.toLowerCase().includes(value.toLowerCase()) ||
+          location.country.toLowerCase().includes(value.toLowerCase()) ||
+          location.region?.toLowerCase().includes(value.toLowerCase())
       );
       setSuggestions(filtered);
       setShowSuggestions(true);
@@ -106,10 +107,10 @@ export function LocationSearch({
   }, [value]);
 
   const handleLocationSelect = (location: LocationSuggestion) => {
-    const displayName = location.region 
+    const displayName = location.region
       ? `${location.name}, ${location.region}, ${location.country}`
       : `${location.name}, ${location.country}`;
-    
+
     onValueChange(displayName);
     onLocationSelect?.(location);
     setShowSuggestions(false);
@@ -125,7 +126,7 @@ export function LocationSearch({
   const renderSuggestion = ({ item }: { item: LocationSuggestion }) => (
     <Pressable
       onPress={() => handleLocationSelect(item)}
-      className="flex-row items-center px-4 py-3 border-b border-gray-100"
+      className="flex-row items-center border-b border-gray-100 px-4 py-3"
       android_ripple={{ color: '#f3f4f6' }}
     >
       <MapPin width={18} height={18} color="#6B7280" />
@@ -142,12 +143,14 @@ export function LocationSearch({
     <View className={className}>
       {/* Search Input */}
       <View className="relative">
-        <View className={`
-          flex-row items-center bg-white border rounded-lg px-3 py-3
+        <View
+          className={`
+          flex-row items-center rounded-lg border bg-white p-3
           ${error ? 'border-red-500' : isFocused ? 'border-blue-500' : 'border-gray-300'}
-        `}>
+        `}
+        >
           <Search width={20} height={20} color="#6B7280" />
-          
+
           <TextInput
             ref={inputRef}
             value={value}
@@ -160,7 +163,7 @@ export function LocationSearch({
             }}
             placeholder={placeholder}
             placeholderTextColor="#9CA3AF"
-            className="flex-1 ml-3 text-gray-900 text-base"
+            className="ml-3 flex-1 text-base text-gray-900"
             autoCapitalize="words"
             autoCorrect={false}
           />
@@ -178,14 +181,12 @@ export function LocationSearch({
         </View>
 
         {/* Error Message */}
-        {error && (
-          <Text className="text-red-600 text-sm mt-1">{error}</Text>
-        )}
+        {error && <Text className="mt-1 text-sm text-red-600">{error}</Text>}
       </View>
 
       {/* Suggestions List */}
       {showSuggestions && suggestions.length > 0 && (
-        <View className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-lg mt-1 max-h-60 shadow-lg">
+        <View className="absolute inset-x-0 top-full z-10 mt-1 max-h-60 rounded-lg border border-gray-200 bg-white shadow-lg">
           <FlatList
             data={suggestions}
             keyExtractor={(item) => item.id}
@@ -198,13 +199,13 @@ export function LocationSearch({
 
       {/* No Results */}
       {showSuggestions && value.length >= 2 && suggestions.length === 0 && (
-        <View className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-lg mt-1 shadow-lg">
-          <View className="px-4 py-6 items-center">
+        <View className="absolute inset-x-0 top-full z-10 mt-1 rounded-lg border border-gray-200 bg-white shadow-lg">
+          <View className="items-center px-4 py-6">
             <MapPin width={24} height={24} color="#9CA3AF" />
-            <Text className="text-gray-500 text-center mt-2">
+            <Text className="mt-2 text-center text-gray-500">
               No destinations found for "{value}"
             </Text>
-            <Text className="text-gray-400 text-sm text-center mt-1">
+            <Text className="mt-1 text-center text-sm text-gray-400">
               Try searching for a city, country, or landmark
             </Text>
           </View>

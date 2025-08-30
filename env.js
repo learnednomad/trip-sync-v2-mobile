@@ -35,12 +35,12 @@ require('dotenv').config({
 
 // TODO: Replace these values with your own
 
-const BUNDLE_ID = 'com.trip-sync-mobile-v2'; // ios bundle id
-const PACKAGE = 'com.trip_sync_mobile_v2'; // android package name
-const NAME = 'trip-sync-mobile-v2'; // app name
-const EXPO_ACCOUNT_OWNER = 'expo-owner'; // expo account owner
-const EAS_PROJECT_ID = 'c3e1075b-6fe7-4686-aa49-35b46a229044'; // eas project id
-const SCHEME = 'trip-sync-mobile-v2'; // app scheme
+const BUNDLE_ID = 'com.smbc.tripsync'; // ios bundle id
+const PACKAGE = 'com.smbc.tripsync'; // android package name
+const NAME = 'Trip Sync'; // app name
+const EXPO_ACCOUNT_OWNER = 'saninabil'; // expo account owner
+const EAS_PROJECT_ID = 'c1582f7a-d5b6-44e8-b17e-01bd5081793b'; // eas project id
+const SCHEME = 'tripsync'; // app scheme
 
 /**
  * We declare a function withEnvSuffix that will add a suffix to the variable name based on the APP_ENV

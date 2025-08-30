@@ -133,14 +133,14 @@ export interface UpdateTripRequest extends Partial<CreateTripRequest> {
   version: number; // For optimistic locking
 }
 
-export type TripType = 
-  | 'BUSINESS' 
-  | 'LEISURE' 
-  | 'FAMILY' 
-  | 'ADVENTURE' 
-  | 'ROMANTIC' 
-  | 'EDUCATIONAL' 
-  | 'CULTURAL' 
+export type TripType =
+  | 'BUSINESS'
+  | 'LEISURE'
+  | 'FAMILY'
+  | 'ADVENTURE'
+  | 'ROMANTIC'
+  | 'EDUCATIONAL'
+  | 'CULTURAL'
   | 'WELLNESS';
 
 export interface TripListParams extends SearchParams {
@@ -200,6 +200,12 @@ export interface DeleteTripResponse {
   message: string;
 }
 
+export interface TripParticipantsResponse {
+  participants: TripParticipant[];
+  total: number;
+  tripId: string;
+}
+
 export interface RemoveParticipantResponse {
   message: string;
 }
@@ -213,6 +219,7 @@ export type InviteParticipantApiResponse =
   ApiResponse<InviteParticipantResponse>;
 export type UpdateParticipantApiResponse =
   ApiResponse<UpdateParticipantResponse>;
+export type TripParticipantsApiResponse = ApiResponse<TripParticipantsResponse>;
 export type DeleteTripApiResponse = ApiResponse<DeleteTripResponse>;
 export type RemoveParticipantApiResponse =
   ApiResponse<RemoveParticipantResponse>;

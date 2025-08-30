@@ -217,6 +217,19 @@ export const useRemoveParticipant = (tripId: string) => {
 };
 
 /**
+ * Get trip participants
+ */
+export const useTripParticipants = (tripId: string, options?: { enabled?: boolean }) => {
+  return useQuery({
+    queryKey: tripKeys.participants(tripId),
+    queryFn: () => tripsApi.getTripParticipants(tripId),
+    enabled: options?.enabled ?? !!tripId,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+  });
+};
+
+/**
  * Optimistic update helper for trip modifications
  */
 export const useOptimisticTripUpdate = (tripId: string) => {

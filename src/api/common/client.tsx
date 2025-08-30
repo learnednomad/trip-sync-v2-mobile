@@ -35,7 +35,7 @@ export const client = axios.create({
 client.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = getToken();
-    
+
     // Enhanced token debugging with validation
     if (__DEV__) {
       console.log('🔍 Request interceptor - Token check:');
@@ -45,8 +45,11 @@ client.interceptors.request.use(
       console.log('  - Access token exists:', !!token?.access);
       console.log('  - Access token length:', token?.access?.length || 0);
       if (token?.access) {
-        console.log('  - Access token preview:', token.access.substring(0, 50) + '...');
-        
+        console.log(
+          '  - Access token preview:',
+          token.access.substring(0, 50) + '...'
+        );
+
         // Additional token validation
         try {
           const tokenParts = token.access.split('.');
@@ -57,14 +60,17 @@ client.interceptors.request.use(
             const now = Math.floor(Date.now() / 1000);
             const isExpired = payload.exp && payload.exp < now;
             console.log('  - Token expired:', isExpired);
-            console.log('  - Token expires at:', new Date((payload.exp || 0) * 1000).toISOString());
+            console.log(
+              '  - Token expires at:',
+              new Date((payload.exp || 0) * 1000).toISOString()
+            );
           }
         } catch (e) {
-          console.log('  - Token validation error:', e.message);
+          console.log('  - Token validation error:', (e as Error).message);
         }
       }
     }
-    
+
     // Enhanced token validation
     if (token?.access) {
       // Validate token format (basic JWT check)
@@ -80,7 +86,7 @@ client.interceptors.request.use(
           const payload = JSON.parse(atob(tokenParts[1]));
           const now = Math.floor(Date.now() / 1000);
           const isExpired = payload.exp && payload.exp < now;
-          
+
           if (isExpired) {
             if (__DEV__) {
               console.error('❌ Access token is expired');
@@ -94,7 +100,7 @@ client.interceptors.request.use(
           }
         } catch (e) {
           if (__DEV__) {
-            console.error('❌ Token validation failed:', e.message);
+            console.error('❌ Token validation failed:', (e as Error).message);
           }
           // Set token anyway - let server validate
           config.headers.Authorization = `Bearer ${token.access}`;
@@ -104,14 +110,17 @@ client.interceptors.request.use(
       if (__DEV__) {
         console.log('❌ No access token available - header not set');
         console.log('❌ This will likely result in 401 UNAUTHORIZED');
-        
+
         // Check if this is an auth endpoint that doesn't need tokens
-        const isAuthEndpoint = config.url?.includes('/auth/login') || 
-                              config.url?.includes('/auth/register') ||
-                              config.url?.includes('/auth/refresh');
-        
+        const isAuthEndpoint =
+          config.url?.includes('/auth/login') ||
+          config.url?.includes('/auth/register') ||
+          config.url?.includes('/auth/refresh');
+
         if (!isAuthEndpoint) {
-          console.warn('⚠️  Non-auth endpoint called without token - this will fail');
+          console.warn(
+            '⚠️  Non-auth endpoint called without token - this will fail'
+          );
         }
       }
     }
@@ -127,7 +136,9 @@ client.interceptors.request.use(
           data: config.data,
           headers: {
             ...config.headers,
-            Authorization: config.headers.Authorization ? 'Bearer [TOKEN]' : 'NOT SET'
+            Authorization: config.headers.Authorization
+              ? 'Bearer [TOKEN]'
+              : 'NOT SET',
           },
         }
       );
@@ -181,7 +192,7 @@ client.interceptors.response.use(
       console.log('\n🔄 === TOKEN REFRESH TRIGGERED ===');
       console.log('🎯 Original request URL:', originalRequest.url);
       console.log('📊 Error message:', error.response?.data?.error?.message);
-      
+
       originalRequest._retry = true;
 
       try {
@@ -190,39 +201,45 @@ client.interceptors.response.use(
           exists: !!token,
           hasAccess: !!token?.access,
           hasRefresh: !!token?.refresh,
-          refreshLength: token?.refresh?.length || 0
+          refreshLength: token?.refresh?.length || 0,
         });
-        
+
         if (token?.refresh) {
           console.log('🔄 Attempting token refresh...');
           const refreshResponse = await refreshToken(token.refresh);
           console.log('📥 Refresh response:', {
             success: refreshResponse.success,
             hasData: !!refreshResponse.data,
-            dataKeys: refreshResponse.data ? Object.keys(refreshResponse.data) : []
+            dataKeys: refreshResponse.data
+              ? Object.keys(refreshResponse.data)
+              : [],
           });
-          
+
           if (refreshResponse.success && refreshResponse.data) {
             console.log('✅ Token refresh successful');
-            
+
             // Update stored token - handle different response formats
             const newTokenData = {
-              access: refreshResponse.data.accessToken || refreshResponse.data.access,
-              refresh: refreshResponse.data.refreshToken || refreshResponse.data.refresh || token.refresh
+              access:
+                refreshResponse.data.accessToken || refreshResponse.data.access,
+              refresh:
+                refreshResponse.data.refreshToken ||
+                refreshResponse.data.refresh ||
+                token.refresh,
             };
-            
+
             console.log('💾 Storing new tokens:', {
               accessLength: newTokenData.access?.length || 0,
-              refreshLength: newTokenData.refresh?.length || 0
+              refreshLength: newTokenData.refresh?.length || 0,
             });
-            
+
             const { setToken } = await import('@/lib/auth/utils');
             setToken(newTokenData);
 
             // Retry original request
             originalRequest.headers.Authorization = `Bearer ${newTokenData.access}`;
             console.log('🔁 Retrying original request with new token...');
-            
+
             const retryResponse = await client(originalRequest);
             console.log('✅ Retry successful!');
             console.log('🏁 === END TOKEN REFRESH SUCCESS ===\n');
@@ -235,11 +252,11 @@ client.interceptors.response.use(
         }
       } catch (refreshError) {
         console.error('❌ Token refresh failed:', refreshError);
-        
+
         // Refresh failed, sign out user
         console.log('🧹 Clearing tokens due to refresh failure');
         removeToken();
-        
+
         console.log('🏁 === END TOKEN REFRESH FAILURE ===\n');
         throw new AuthenticationError('Session expired. Please sign in again.');
       }

@@ -7,7 +7,11 @@ interface SparklesProps {
   color?: string;
 }
 
-export function Sparkles({ width = 24, height = 24, color = 'currentColor' }: SparklesProps) {
+export function Sparkles({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: SparklesProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

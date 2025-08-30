@@ -3,14 +3,20 @@
  * Test your backend's JWT validation configuration
  */
 
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Env } from '@env';
+import React from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export const BackendFixTest: React.FC = () => {
   const testBackendConfig = async () => {
     console.log('\n🔧 === BACKEND CONFIGURATION TEST ===');
-    
+
     try {
       // Test 1: Check if backend health endpoint works
       console.log('🏥 Testing backend health...');
@@ -18,44 +24,49 @@ export const BackendFixTest: React.FC = () => {
       console.log('📊 Health status:', healthResponse.status);
       const healthData = await healthResponse.text();
       console.log('📥 Health response:', healthData);
-      
+
       // Test 2: Check JWT configuration endpoint
       console.log('\n🔑 Testing JWT configuration...');
-      const jwtConfigResponse = await fetch(`${Env.API_URL}/api/v2/auth/jwt-config`);
+      const jwtConfigResponse = await fetch(
+        `${Env.API_URL}/api/v2/auth/jwt-config`
+      );
       console.log('📊 JWT config status:', jwtConfigResponse.status);
-      
+
       if (jwtConfigResponse.ok) {
         const jwtConfigData = await jwtConfigResponse.json();
         console.log('📥 JWT config:', jwtConfigData);
       } else {
         console.log('❌ JWT config endpoint not available');
       }
-      
+
       // Test 3: Test with a sample JWT payload
       console.log('\n🧪 Testing JWT validation...');
-      
+
       // This is the actual token structure your backend should expect
       const sampleJWT = {
-        "iss": "https://trdizrlxtflmjrxnnici.supabase.co/auth/v1",
-        "sub": "bde000f9-bf6c-419b-8c0b-db91be4d5824", 
-        "aud": "authenticated",
-        "exp": Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
-        "iat": Math.floor(Date.now() / 1000),
-        "email": "texminer8@gmail.com",
-        "role": "authenticated"
+        iss: 'https://trdizrlxtflmjrxnnici.supabase.co/auth/v1',
+        sub: 'bde000f9-bf6c-419b-8c0b-db91be4d5824',
+        aud: 'authenticated',
+        exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
+        iat: Math.floor(Date.now() / 1000),
+        email: 'texminer8@gmail.com',
+        role: 'authenticated',
       };
-      
+
       console.log('🔍 Expected JWT payload structure:', sampleJWT);
       console.log('\n💡 BACKEND CONFIGURATION NEEDED:');
-      console.log('   1. Supabase JWT Secret: Check your Supabase project settings');
-      console.log('   2. JWT Validation URL: https://trdizrlxtflmjrxnnici.supabase.co/auth/v1');
+      console.log(
+        '   1. Supabase JWT Secret: Check your Supabase project settings'
+      );
+      console.log(
+        '   2. JWT Validation URL: https://trdizrlxtflmjrxnnici.supabase.co/auth/v1'
+      );
       console.log('   3. Expected audience: "authenticated"');
       console.log('   4. Token format: Bearer <supabase_jwt>');
-      
     } catch (error) {
       console.error('🚨 Backend test failed:', error);
     }
-    
+
     console.log('🏁 === END BACKEND TEST ===\n');
   };
 
@@ -93,29 +104,31 @@ export const BackendFixTest: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>🔧 Backend Fix Helper</Text>
-      
+
       <TouchableOpacity style={styles.button} onPress={testBackendConfig}>
         <Text style={styles.buttonText}>🏥 Test Backend Config</Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={showBackendConfigInstructions}>
+
+      <TouchableOpacity
+        style={[styles.button, styles.buttonSecondary]}
+        onPress={showBackendConfigInstructions}
+      >
         <Text style={styles.buttonText}>📋 Show Fix Instructions</Text>
       </TouchableOpacity>
 
       <View style={styles.infoBox}>
         <Text style={styles.infoTitle}>🚨 CRITICAL ISSUE IDENTIFIED</Text>
         <Text style={styles.infoText}>
-          Your authentication flow is working perfectly, but your backend is rejecting valid Supabase JWT tokens.
+          Your authentication flow is working perfectly, but your backend is
+          rejecting valid Supabase JWT tokens.
           {'\n\n'}
-          The mobile app successfully:
-          • ✅ Logs in and gets tokens
-          • ✅ Stores tokens correctly  
-          • ✅ Attaches Bearer token to requests
+          The mobile app successfully: • ✅ Logs in and gets tokens • ✅ Stores
+          tokens correctly • ✅ Attaches Bearer token to requests
           {'\n\n'}
-          But your backend returns:
-          • ❌ "Invalid or expired token"
+          But your backend returns: • ❌ "Invalid or expired token"
           {'\n\n'}
-          This means your Hono API auth middleware needs to be configured to validate Supabase JWTs properly.
+          This means your Hono API auth middleware needs to be configured to
+          validate Supabase JWTs properly.
         </Text>
       </View>
     </ScrollView>

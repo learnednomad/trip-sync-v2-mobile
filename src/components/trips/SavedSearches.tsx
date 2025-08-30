@@ -5,13 +5,14 @@
  */
 
 import React, { useState } from 'react';
-import { View, ScrollView } from 'react-native';
-import { Bookmark, BookmarkCheck, X } from '@/components/ui/icons';
+import { ScrollView, View } from 'react-native';
 
-import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import type { TripListParams } from '@/api/trips/types';
+import { Button } from '@/components/ui/button';
+import { Bookmark, BookmarkCheck, X } from '@/components/ui/icons';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
+
 import type { SearchFilters } from './SearchFilters';
 
 interface SavedSearch {
@@ -40,7 +41,7 @@ export function SavedSearches({
 }: SavedSearchesProps) {
   const [showSaveForm, setShowSaveForm] = useState(false);
   const [searchName, setSearchName] = useState('');
-  
+
   // Mock saved searches - in real app this would come from storage/API
   const [savedSearches] = useState<SavedSearch[]>([
     {
@@ -71,11 +72,11 @@ export function SavedSearches({
 
   const hasActiveSearch = Boolean(
     currentSearch ||
-    currentFilters.status ||
-    currentFilters.upcoming ||
-    currentFilters.role ||
-    currentSearchFilters.destination ||
-    currentSearchFilters.tripType
+      currentFilters.status ||
+      currentFilters.upcoming ||
+      currentFilters.role ||
+      currentSearchFilters.destination ||
+      currentSearchFilters.tripType
   );
 
   const handleSaveSearch = () => {
@@ -88,7 +89,7 @@ export function SavedSearches({
 
   const getSearchSummary = (search: SavedSearch) => {
     const parts: string[] = [];
-    
+
     if (search.searchQuery) {
       parts.push(`"${search.searchQuery}"`);
     }
@@ -104,7 +105,7 @@ export function SavedSearches({
     if (search.searchFilters.tripType) {
       parts.push(`Type: ${search.searchFilters.tripType}`);
     }
-    
+
     return parts.join(' • ');
   };
 
@@ -113,11 +114,13 @@ export function SavedSearches({
   }
 
   return (
-    <View className="bg-gray-50 border-b border-gray-100">
+    <View className="border-b border-gray-100 bg-gray-50">
       <View className="px-4 py-3">
-        <View className="flex-row items-center justify-between mb-3">
-          <Text className="text-sm font-medium text-gray-700">Quick Searches</Text>
-          
+        <View className="mb-3 flex-row items-center justify-between">
+          <Text className="text-sm font-medium text-gray-700">
+            Quick Searches
+          </Text>
+
           {hasActiveSearch && !showSaveForm && (
             <Button
               variant="outline"
@@ -126,15 +129,17 @@ export function SavedSearches({
               className="flex-row items-center px-3"
             >
               <Bookmark width={14} height={14} color="#6B7280" />
-              <Text className="text-gray-700 ml-1 text-xs">Save</Text>
+              <Text className="ml-1 text-xs text-gray-700">Save</Text>
             </Button>
           )}
         </View>
 
         {/* Save Search Form */}
         {showSaveForm && (
-          <View className="mb-3 p-3 bg-white rounded-lg border border-gray-200">
-            <Text className="text-sm font-medium text-gray-700 mb-2">Save Current Search</Text>
+          <View className="mb-3 rounded-lg border border-gray-200 bg-white p-3">
+            <Text className="mb-2 text-sm font-medium text-gray-700">
+              Save Current Search
+            </Text>
             <View className="flex-row items-center space-x-2">
               <View className="flex-1">
                 <Input
@@ -151,7 +156,7 @@ export function SavedSearches({
                 disabled={!searchName.trim()}
                 className="px-3"
               >
-                <Text className="text-white text-xs">Save</Text>
+                <Text className="text-xs text-white">Save</Text>
               </Button>
               <Button
                 variant="ghost"
@@ -177,16 +182,19 @@ export function SavedSearches({
                 variant="outline"
                 size="sm"
                 onPress={() => onApplySearch(search)}
-                className="min-w-[200px] justify-start px-3 py-2 h-auto"
+                className="h-auto min-w-[200px] justify-start px-3 py-2"
               >
                 <View className="flex-1">
-                  <View className="flex-row items-center mb-1">
+                  <View className="mb-1 flex-row items-center">
                     <BookmarkCheck width={12} height={12} color="#059669" />
-                    <Text className="text-gray-800 font-medium text-xs ml-1" numberOfLines={1}>
+                    <Text
+                      className="ml-1 text-xs font-medium text-gray-800"
+                      numberOfLines={1}
+                    >
                       {search.name}
                     </Text>
                   </View>
-                  <Text className="text-gray-500 text-xs" numberOfLines={1}>
+                  <Text className="text-xs text-gray-500" numberOfLines={1}>
                     {getSearchSummary(search)}
                   </Text>
                 </View>

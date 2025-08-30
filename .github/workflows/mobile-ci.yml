@@ -1,0 +1,265 @@
+name: Mobile CI - Quality Checks
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'trip-sync-mobile-v2/**'
+      - '.github/workflows/mobile-ci.yml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'trip-sync-mobile-v2/**'
+      - '.github/workflows/mobile-ci.yml'
+
+env:
+  NODE_VERSION: '18.x'
+  PNPM_VERSION: '8.15.0'
+
+defaults:
+  run:
+    working-directory: ./trip-sync-mobile-v2
+
+jobs:
+  lint-and-typecheck:
+    name: 🔍 Lint & Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: trip-sync-mobile-v2/package-lock.json
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Run ESLint
+        run: pnpm lint
+
+      - name: 🔍 Run TypeScript type checking
+        run: pnpm type-check
+
+      - name: 🌐 Lint translations
+        run: pnpm lint:translations
+
+  test:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: trip-sync-mobile-v2/package-lock.json
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Run unit tests
+        run: pnpm test:ci
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          directory: ./trip-sync-mobile-v2/coverage
+          flags: mobile
+          name: trip-sync-mobile-coverage
+          fail_ci_if_error: false
+
+  build-validation:
+    name: 🏗 Build Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        environment: [development, staging, production]
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: trip-sync-mobile-v2/package-lock.json
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔨 Prebuild for ${{ matrix.environment }}
+        run: cross-env APP_ENV=${{ matrix.environment }} pnpm prebuild
+        env:
+          EXPO_NO_DOTENV: 1
+
+      - name: ✅ Validate build configuration
+        run: |
+          if [ ! -d "ios" ] || [ ! -d "android" ]; then
+            echo "❌ Prebuild failed - missing platform directories"
+            exit 1
+          fi
+          echo "✅ Build validation successful for ${{ matrix.environment }}"
+
+  e2e-test:
+    name: 🎭 E2E Tests (Maestro)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: trip-sync-mobile-v2/package-lock.json
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 🎭 Setup Maestro CLI
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔨 Prebuild for development
+        run: pnpm prebuild:development
+        env:
+          EXPO_NO_DOTENV: 1
+          APP_ENV: development
+
+      - name: 🎭 Run E2E tests
+        run: |
+          # Start Metro in background
+          pnpm start &
+          METRO_PID=$!
+          
+          # Wait for Metro to start
+          sleep 30
+          
+          # Run Maestro tests
+          maestro test .maestro/ -e APP_ID=com.tripsync.development || MAESTRO_FAILED=1
+          
+          # Cleanup
+          kill $METRO_PID || true
+          
+          # Fail if Maestro tests failed
+          if [ "$MAESTRO_FAILED" = "1" ]; then
+            echo "❌ E2E tests failed"
+            exit 1
+          fi
+        env:
+          APP_ENV: development
+
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔒 Run npm audit
+        working-directory: ./trip-sync-mobile-v2
+        run: |
+          npm audit --audit-level=high --production
+          
+      - name: 🔒 Check for hardcoded secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./trip-sync-mobile-v2
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+
+  quality-gate:
+    name: ✅ Quality Gate
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, test, build-validation, security-scan]
+    if: always()
+
+    steps:
+      - name: ✅ Check all jobs passed
+        run: |
+          if [[ "${{ needs.lint-and-typecheck.result }}" != "success" ]] || \
+             [[ "${{ needs.test.result }}" != "success" ]] || \
+             [[ "${{ needs.build-validation.result }}" != "success" ]] || \
+             [[ "${{ needs.security-scan.result }}" != "success" ]]; then
+            echo "❌ Quality gate failed - one or more checks did not pass"
+            exit 1
+          fi
+          echo "✅ All quality checks passed!"
+
+  slack-notification:
+    name: 📱 Slack Notification
+    runs-on: ubuntu-latest
+    needs: [quality-gate]
+    if: always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    steps:
+      - name: 📱 Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ needs.quality-gate.result }}
+          channel: '#trip-sync-ci'
+          username: 'GitHub Actions'
+          icon_emoji: ':robot_face:'
+          title: 'Mobile CI Pipeline'
+          text: |
+            *Repository:* ${{ github.repository }}
+            *Branch:* ${{ github.ref_name }}
+            *Event:* ${{ github.event_name }}
+            *Status:* ${{ needs.quality-gate.result }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

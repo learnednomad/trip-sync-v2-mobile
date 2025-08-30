@@ -3,12 +3,12 @@
  * Allows users to select images from gallery or camera
  */
 
-import React, { useState } from 'react';
-import { View, Pressable, Image, Alert } from 'react-native';
 import * as ImagePickerExpo from 'expo-image-picker';
+import React, { useState } from 'react';
+import { Alert, Image, Pressable, View } from 'react-native';
 
-import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 
 interface ImagePickerProps {
   imageUri?: string;
@@ -17,16 +17,17 @@ interface ImagePickerProps {
   className?: string;
 }
 
-export function ImagePicker({ 
-  imageUri, 
-  onImageSelect, 
-  placeholder = "Add an image", 
-  className = '' 
+export function ImagePicker({
+  imageUri,
+  onImageSelect,
+  placeholder = 'Add an image',
+  className = '',
 }: ImagePickerProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const requestPermissions = async () => {
-    const { status } = await ImagePickerExpo.requestMediaLibraryPermissionsAsync();
+    const { status } =
+      await ImagePickerExpo.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert(
         'Permission Required',
@@ -69,15 +70,11 @@ export function ImagePicker({
   };
 
   const showImagePicker = () => {
-    Alert.alert(
-      'Select Image',
-      'Choose how you want to select an image',
-      [
-        { text: 'Camera', onPress: () => pickImage(true) },
-        { text: 'Gallery', onPress: () => pickImage(false) },
-        { text: 'Cancel', style: 'cancel' },
-      ]
-    );
+    Alert.alert('Select Image', 'Choose how you want to select an image', [
+      { text: 'Camera', onPress: () => pickImage(true) },
+      { text: 'Gallery', onPress: () => pickImage(false) },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
   const removeImage = () => {
@@ -89,24 +86,24 @@ export function ImagePicker({
       <View className={`relative ${className}`}>
         <Image
           source={{ uri: imageUri }}
-          className="w-full h-40 rounded-lg bg-gray-100"
+          className="h-40 w-full rounded-lg bg-gray-100"
           resizeMode="cover"
         />
-        <View className="absolute top-2 right-2 flex-row space-x-2">
+        <View className="absolute right-2 top-2 flex-row space-x-2">
           <Button
             onPress={showImagePicker}
             size="sm"
             className="bg-white/90 px-3 py-1"
           >
-            <Text className="text-gray-700 text-sm">Change</Text>
+            <Text className="text-sm text-gray-700">Change</Text>
           </Button>
           <Button
             onPress={removeImage}
             size="sm"
             variant="outline"
-            className="bg-white/90 border-red-300 px-3 py-1"
+            className="border-red-300 bg-white/90 px-3 py-1"
           >
-            <Text className="text-red-600 text-sm">Remove</Text>
+            <Text className="text-sm text-red-600">Remove</Text>
           </Button>
         </View>
       </View>
@@ -117,16 +114,16 @@ export function ImagePicker({
     <Pressable
       onPress={showImagePicker}
       disabled={isLoading}
-      className={`border-2 border-dashed border-gray-300 rounded-lg h-40 items-center justify-center bg-gray-50 ${className}`}
+      className={`h-40 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 ${className}`}
     >
       <View className="items-center space-y-2">
-        <View className="w-12 h-12 rounded-full bg-gray-200 items-center justify-center">
-          <Text className="text-gray-400 text-xl">📷</Text>
+        <View className="size-12 items-center justify-center rounded-full bg-gray-200">
+          <Text className="text-xl text-gray-400">📷</Text>
         </View>
-        <Text className="text-gray-600 font-medium">
+        <Text className="font-medium text-gray-600">
           {isLoading ? 'Loading...' : placeholder}
         </Text>
-        <Text className="text-gray-400 text-sm">
+        <Text className="text-sm text-gray-400">
           Tap to {isLoading ? 'wait...' : 'select image'}
         </Text>
       </View>

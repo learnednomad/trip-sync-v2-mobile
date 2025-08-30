@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 interface EyeProps {
   width?: number;
@@ -7,7 +7,11 @@ interface EyeProps {
   color?: string;
 }
 
-export function Eye({ width = 24, height = 24, color = 'currentColor' }: EyeProps) {
+export function Eye({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: EyeProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

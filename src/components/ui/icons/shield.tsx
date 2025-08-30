@@ -7,7 +7,11 @@ interface ShieldProps {
   color?: string;
 }
 
-export function Shield({ width = 24, height = 24, color = 'currentColor' }: ShieldProps) {
+export function Shield({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: ShieldProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

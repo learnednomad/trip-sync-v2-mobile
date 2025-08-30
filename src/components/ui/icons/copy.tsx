@@ -7,7 +7,11 @@ interface CopyProps {
   color?: string;
 }
 
-export function Copy({ width = 24, height = 24, color = 'currentColor' }: CopyProps) {
+export function Copy({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: CopyProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Rect

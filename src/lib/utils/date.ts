@@ -55,17 +55,25 @@ export function formatFullDate(date: string | Date): string {
  * @param endDate - End date (ISO string or Date object)
  * @returns Number of days between the dates
  */
-export function getDaysBetween(startDate: string | Date, endDate: string | Date): number {
+export function getDaysBetween(
+  startDate: string | Date,
+  endDate: string | Date
+): number {
   try {
-    const start = typeof startDate === 'string' ? parseISO(startDate) : startDate;
+    const start =
+      typeof startDate === 'string' ? parseISO(startDate) : startDate;
     const end = typeof endDate === 'string' ? parseISO(endDate) : endDate;
-    
+
     const diffTime = end.getTime() - start.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return Math.max(0, diffDays);
   } catch (error) {
-    console.warn('Invalid dates provided to getDaysBetween:', startDate, endDate);
+    console.warn(
+      'Invalid dates provided to getDaysBetween:',
+      startDate,
+      endDate
+    );
     return 0;
   }
 }
@@ -93,7 +101,7 @@ export function isToday(date: string | Date): boolean {
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
     const today = new Date();
-    
+
     return (
       dateObj.getDate() === today.getDate() &&
       dateObj.getMonth() === today.getMonth() &&
@@ -121,7 +129,7 @@ export function getRelativeTime(date: string | Date): string {
     if (diffDays === -1) return 'Yesterday';
     if (diffDays > 1) return `In ${diffDays} days`;
     if (diffDays < -1) return `${Math.abs(diffDays)} days ago`;
-    
+
     return formatDisplayDate(date);
   } catch (error) {
     return 'Invalid Date';

@@ -5,16 +5,24 @@
 
 import React from 'react';
 import { View } from 'react-native';
-import { MapPin } from '@/components/ui/icons';
 
-import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
+import { MapPin } from '@/components/ui/icons';
+import { Text } from '@/components/ui/text';
 
 // Create a simple alert circle icon since we don't have it yet
-function AlertCircle({ color = '#000', width = 24, height = 24 }: { color?: string; width?: number; height?: number }) {
+function AlertCircle({
+  color = '#000',
+  width = 24,
+  height = 24,
+}: {
+  color?: string;
+  width?: number;
+  height?: number;
+}) {
   return (
-    <View className="w-12 h-12 rounded-full bg-red-100 items-center justify-center">
-      <Text className="text-red-600 text-xl font-bold">!</Text>
+    <View className="size-12 items-center justify-center rounded-full bg-red-100">
+      <Text className="text-xl font-bold text-red-600">!</Text>
     </View>
   );
 }
@@ -22,7 +30,7 @@ function AlertCircle({ color = '#000', width = 24, height = 24 }: { color?: stri
 // Icon mapping
 const iconMap = {
   'alert-circle': AlertCircle,
-  'map': MapPin,
+  map: MapPin,
 } as const;
 
 interface EmptyStateAction {
@@ -38,49 +46,44 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({ 
-  icon = 'map', 
-  title, 
-  description, 
-  action, 
-  className = '' 
+export function EmptyState({
+  icon = 'map',
+  title,
+  description,
+  action,
+  className = '',
 }: EmptyStateProps) {
   const IconComponent = iconMap[icon];
 
   return (
-    <View className={`items-center justify-center py-8 px-4 ${className}`}>
+    <View className={`items-center justify-center px-4 py-8 ${className}`}>
       {/* Icon */}
       <View className="mb-4">
         {icon === 'alert-circle' ? (
           <AlertCircle />
         ) : (
-          <View className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center">
+          <View className="size-12 items-center justify-center rounded-full bg-gray-100">
             <IconComponent width={24} height={24} color="#6B7280" />
           </View>
         )}
       </View>
 
       {/* Title */}
-      <Text className="text-lg font-semibold text-gray-900 text-center mb-2">
+      <Text className="mb-2 text-center text-lg font-semibold text-gray-900">
         {title}
       </Text>
 
       {/* Description */}
       {description && (
-        <Text className="text-sm text-gray-600 text-center mb-6 max-w-xs leading-relaxed">
+        <Text className="mb-6 max-w-xs text-center text-sm leading-relaxed text-gray-600">
           {description}
         </Text>
       )}
 
       {/* Action Button */}
       {action && (
-        <Button
-          onPress={action.onPress}
-          className="bg-blue-600 px-6"
-        >
-          <Text className="text-white font-medium">
-            {action.label}
-          </Text>
+        <Button onPress={action.onPress} className="bg-blue-600 px-6">
+          <Text className="font-medium text-white">{action.label}</Text>
         </Button>
       )}
     </View>

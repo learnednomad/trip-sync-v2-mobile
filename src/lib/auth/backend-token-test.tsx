@@ -3,23 +3,24 @@
  * Test if your backend can validate the Supabase JWT tokens
  */
 
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Env } from '@env';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { getToken } from './utils';
 
 export const BackendTokenTest: React.FC = () => {
   const testTokenValidation = async () => {
     console.log('\n🔬 === BACKEND TOKEN VALIDATION TEST ===');
-    
+
     const token = getToken();
     if (!token?.access) {
       console.log('❌ No access token available - please login first');
       return;
     }
-    
+
     console.log('🔑 Testing token:', token.access.substring(0, 50) + '...');
-    
+
     try {
       // Test the token verification endpoint
       console.log('🧪 Testing /api/v2/auth/verify endpoint...');
@@ -27,49 +28,54 @@ export const BackendTokenTest: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.access}`
+          Authorization: `Bearer ${token.access}`,
         },
-        body: JSON.stringify({ token: token.access })
+        body: JSON.stringify({ token: token.access }),
       });
-      
+
       console.log('📊 Verify response status:', verifyResponse.status);
       const verifyData = await verifyResponse.json();
       console.log('📥 Verify response data:', verifyData);
-      
+
       if (verifyResponse.ok) {
         console.log('✅ Token is valid according to backend');
       } else {
         console.log('❌ Token rejected by backend:', verifyData.error?.message);
       }
-      
+
       // Test a protected endpoint directly
       console.log('\n🛡️ Testing protected endpoint /api/v2/trips...');
       const tripsResponse = await fetch(`${Env.API_URL}/api/v2/trips`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.access}`
-        }
+          Authorization: `Bearer ${token.access}`,
+        },
       });
-      
+
       console.log('📊 Trips response status:', tripsResponse.status);
       const tripsData = await tripsResponse.json();
       console.log('📥 Trips response data:', tripsData);
-      
+
       if (tripsResponse.ok) {
         console.log('✅ Protected endpoint accessible with current token');
       } else {
-        console.log('❌ Protected endpoint rejected token:', tripsData.error?.message);
-        
+        console.log(
+          '❌ Protected endpoint rejected token:',
+          tripsData.error?.message
+        );
+
         // Check if it's a token format issue
         if (tripsData.error?.message?.includes('Invalid or expired token')) {
           console.log('\n🔍 TOKEN FORMAT ANALYSIS:');
-          
+
           // Decode the JWT payload (client-side, no verification)
           try {
             const parts = token.access.split('.');
             if (parts.length === 3) {
-              const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+              const payload = JSON.parse(
+                atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
+              );
               console.log('📄 JWT Payload:', {
                 issuer: payload.iss,
                 subject: payload.sub,
@@ -77,15 +83,21 @@ export const BackendTokenTest: React.FC = () => {
                 expiration: new Date(payload.exp * 1000),
                 issuedAt: new Date(payload.iat * 1000),
                 email: payload.email,
-                role: payload.role
+                role: payload.role,
               });
-              
+
               // Check if token is expired
               const now = Date.now() / 1000;
               if (payload.exp < now) {
-                console.log('⏰ TOKEN EXPIRED! Expiry:', new Date(payload.exp * 1000));
+                console.log(
+                  '⏰ TOKEN EXPIRED! Expiry:',
+                  new Date(payload.exp * 1000)
+                );
               } else {
-                console.log('⏰ Token is still valid until:', new Date(payload.exp * 1000));
+                console.log(
+                  '⏰ Token is still valid until:',
+                  new Date(payload.exp * 1000)
+                );
               }
             }
           } catch (decodeError) {
@@ -93,11 +105,10 @@ export const BackendTokenTest: React.FC = () => {
           }
         }
       }
-      
     } catch (error) {
       console.error('🚨 Backend token test failed:', error);
     }
-    
+
     console.log('🏁 === END BACKEND TOKEN TEST ===\n');
   };
 

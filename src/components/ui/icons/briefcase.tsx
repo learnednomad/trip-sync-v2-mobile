@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
-import Svg, { Rect, Path } from 'react-native-svg';
+import Svg, { Path, Rect } from 'react-native-svg';
 
 export function Briefcase({ color = '#000', ...props }: SvgProps) {
   return (

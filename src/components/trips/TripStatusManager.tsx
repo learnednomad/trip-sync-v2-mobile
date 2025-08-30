@@ -5,16 +5,22 @@
  */
 
 import React, { useState } from 'react';
-import { View, ScrollView, Alert } from 'react-native';
-import { 
-  Calendar, CheckCircle, XCircle, Clock, Play, 
-  Pause, Archive, RotateCcw, AlertTriangle 
-} from '@/components/ui/icons';
+import { Alert, ScrollView, View } from 'react-native';
 
-import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
-import { Select } from '@/components/ui/select';
 import type { Trip, TripStatus } from '@/api/trips/types';
+import { Button } from '@/components/ui/button';
+import {
+  AlertTriangle,
+  Archive,
+  Calendar,
+  CheckCircle,
+  Copy,
+  Play,
+  RotateCcw,
+  Trash2,
+  XCircle,
+} from '@/components/ui/icons';
+import { Text } from '@/components/ui/text';
 
 interface TripStatusManagerProps {
   trip: Trip;
@@ -166,12 +172,18 @@ const getValidTransitions = (currentStatus: TripStatus): StatusTransition[] => {
 
 const getStatusProgress = (status: TripStatus): number => {
   switch (status) {
-    case 'PLANNING': return 25;
-    case 'CONFIRMED': return 50;
-    case 'IN_PROGRESS': return 75;
-    case 'COMPLETED': return 100;
-    case 'CANCELLED': return 0;
-    default: return 0;
+    case 'PLANNING':
+      return 25;
+    case 'CONFIRMED':
+      return 50;
+    case 'IN_PROGRESS':
+      return 75;
+    case 'COMPLETED':
+      return 100;
+    case 'CANCELLED':
+      return 0;
+    default:
+      return 0;
   }
 };
 
@@ -187,20 +199,20 @@ const getNextAutoStatus = (trip: Trip): TripStatus | null => {
   if (trip.status === 'IN_PROGRESS' && now > endDate) {
     return 'COMPLETED';
   }
-  
+
   return null;
 };
 
-export function TripStatusManager({ 
-  trip, 
-  onStatusChange, 
+export function TripStatusManager({
+  trip,
+  onStatusChange,
   onArchiveTrip,
   onDuplicateTrip,
   onDeleteTrip,
-  canManage 
+  canManage,
 }: TripStatusManagerProps) {
   const [showLifecycleActions, setShowLifecycleActions] = useState(false);
-  
+
   const currentConfig = statusConfig[trip.status];
   const validTransitions = getValidTransitions(trip.status);
   const statusProgress = getStatusProgress(trip.status);
@@ -213,10 +225,10 @@ export function TripStatusManager({
         `Are you sure you want to ${transition.description.toLowerCase()}? This action may not be reversible.`,
         [
           { text: 'Cancel', style: 'cancel' },
-          { 
-            text: transition.label, 
+          {
+            text: transition.label,
             style: 'destructive',
-            onPress: () => onStatusChange(transition.to)
+            onPress: () => onStatusChange(transition.to),
           },
         ]
       );
@@ -225,7 +237,9 @@ export function TripStatusManager({
     }
   };
 
-  const handleLifecycleAction = (action: 'archive' | 'duplicate' | 'delete') => {
+  const handleLifecycleAction = (
+    action: 'archive' | 'duplicate' | 'delete'
+  ) => {
     switch (action) {
       case 'archive':
         Alert.alert(
@@ -273,9 +287,11 @@ export function TripStatusManager({
   return (
     <View className="bg-white">
       {/* Current Status Header */}
-      <View className="px-4 py-4 border-b border-gray-100">
-        <View className="flex-row items-center justify-between mb-3">
-          <Text className="text-lg font-semibold text-gray-900">Trip Status</Text>
+      <View className="border-b border-gray-100 p-4">
+        <View className="mb-3 flex-row items-center justify-between">
+          <Text className="text-lg font-semibold text-gray-900">
+            Trip Status
+          </Text>
           {canManage && (
             <Button
               variant="outline"
@@ -290,11 +306,15 @@ export function TripStatusManager({
         {/* Status Badge & Progress */}
         <View className="space-y-3">
           <View className="flex-row items-center">
-            <View className={`px-3 py-2 rounded-lg flex-row items-center mr-3 ${currentConfig.color}`}>
+            <View
+              className={`mr-3 flex-row items-center rounded-lg px-3 py-2 ${currentConfig.color}`}
+            >
               {currentConfig.icon}
-              <Text className="font-medium ml-2">{currentConfig.label}</Text>
+              <Text className="ml-2 font-medium">{currentConfig.label}</Text>
             </View>
-            <Text className="text-gray-600 flex-1">{currentConfig.description}</Text>
+            <Text className="flex-1 text-gray-600">
+              {currentConfig.description}
+            </Text>
           </View>
 
           {/* Progress Bar */}
@@ -303,8 +323,8 @@ export function TripStatusManager({
               <Text className="text-xs text-gray-500">Progress</Text>
               <Text className="text-xs text-gray-500">{statusProgress}%</Text>
             </View>
-            <View className="h-2 bg-gray-200 rounded-full">
-              <View 
+            <View className="h-2 rounded-full bg-gray-200">
+              <View
                 className={`h-2 rounded-full ${
                   trip.status === 'CANCELLED' ? 'bg-red-400' : 'bg-blue-500'
                 }`}
@@ -315,20 +335,28 @@ export function TripStatusManager({
         </View>
 
         {/* Date Information */}
-        <View className="mt-4 bg-gray-50 p-3 rounded-lg">
+        <View className="mt-4 rounded-lg bg-gray-50 p-3">
           <View className="flex-row justify-between">
             <View className="flex-1">
               <Text className="text-xs text-gray-500">Starts</Text>
-              <Text className="text-sm font-medium text-gray-900">{trip.startDate}</Text>
+              <Text className="text-sm font-medium text-gray-900">
+                {trip.startDate}
+              </Text>
               {startDays >= 0 && (
                 <Text className="text-xs text-gray-500">
-                  {startDays === 0 ? 'Today' : startDays === 1 ? 'Tomorrow' : `${startDays} days`}
+                  {startDays === 0
+                    ? 'Today'
+                    : startDays === 1
+                      ? 'Tomorrow'
+                      : `${startDays} days`}
                 </Text>
               )}
             </View>
             <View className="flex-1">
               <Text className="text-xs text-gray-500">Ends</Text>
-              <Text className="text-sm font-medium text-gray-900">{trip.endDate}</Text>
+              <Text className="text-sm font-medium text-gray-900">
+                {trip.endDate}
+              </Text>
               {endDays >= 0 && (
                 <Text className="text-xs text-gray-500">
                   {endDays === 0 ? 'Today' : `${endDays} days`}
@@ -340,19 +368,24 @@ export function TripStatusManager({
 
         {/* Auto Status Suggestion */}
         {suggestedStatus && canManage && (
-          <View className="mt-3 bg-yellow-50 p-3 rounded-lg flex-row items-start">
+          <View className="mt-3 flex-row items-start rounded-lg bg-yellow-50 p-3">
             <AlertTriangle width={16} height={16} color="#D97706" />
             <View className="ml-2 flex-1">
-              <Text className="text-yellow-800 text-sm font-medium">Status Update Suggested</Text>
-              <Text className="text-yellow-700 text-xs mt-1">
-                Based on your trip dates, consider updating status to "{statusConfig[suggestedStatus].label}"
+              <Text className="text-sm font-medium text-yellow-800">
+                Status Update Suggested
+              </Text>
+              <Text className="mt-1 text-xs text-yellow-700">
+                Based on your trip dates, consider updating status to "
+                {statusConfig[suggestedStatus].label}"
               </Text>
               <Button
                 onPress={() => onStatusChange(suggestedStatus)}
                 size="sm"
-                className="bg-yellow-600 mt-2 self-start"
+                className="mt-2 self-start bg-yellow-600"
               >
-                <Text className="text-white text-xs">Update to {statusConfig[suggestedStatus].label}</Text>
+                <Text className="text-xs text-white">
+                  Update to {statusConfig[suggestedStatus].label}
+                </Text>
               </Button>
             </View>
           </View>
@@ -361,8 +394,10 @@ export function TripStatusManager({
 
       {/* Status Transitions */}
       {canManage && validTransitions.length > 0 && (
-        <View className="px-4 py-4 border-b border-gray-100">
-          <Text className="text-sm font-medium text-gray-700 mb-3">Available Actions</Text>
+        <View className="border-b border-gray-100 p-4">
+          <Text className="mb-3 text-sm font-medium text-gray-700">
+            Available Actions
+          </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row space-x-2">
               {validTransitions.map((transition, index) => (
@@ -372,7 +407,9 @@ export function TripStatusManager({
                   className={`${transition.color} flex-row items-center px-4 py-2`}
                 >
                   {transition.icon}
-                  <Text className="text-white font-medium ml-2">{transition.label}</Text>
+                  <Text className="ml-2 font-medium text-white">
+                    {transition.label}
+                  </Text>
                 </Button>
               ))}
             </View>
@@ -382,8 +419,10 @@ export function TripStatusManager({
 
       {/* Lifecycle Actions */}
       {showLifecycleActions && canManage && (
-        <View className="px-4 py-4 border-b border-gray-100">
-          <Text className="text-sm font-medium text-gray-700 mb-3">Trip Management</Text>
+        <View className="border-b border-gray-100 p-4">
+          <Text className="mb-3 text-sm font-medium text-gray-700">
+            Trip Management
+          </Text>
           <View className="space-y-2">
             {(trip.status === 'COMPLETED' || trip.status === 'CANCELLED') && (
               <Button
@@ -392,59 +431,79 @@ export function TripStatusManager({
                 className="flex-row items-center justify-center border-gray-300"
               >
                 <Archive width={16} height={16} color="#6B7280" />
-                <Text className="text-gray-700 font-medium ml-2">Archive Trip</Text>
+                <Text className="ml-2 font-medium text-gray-700">
+                  Archive Trip
+                </Text>
               </Button>
             )}
-            
+
             <Button
               variant="outline"
               onPress={() => handleLifecycleAction('duplicate')}
               className="flex-row items-center justify-center border-blue-200"
             >
               <Copy width={16} height={16} color="#2563EB" />
-              <Text className="text-blue-600 font-medium ml-2">Duplicate Trip</Text>
+              <Text className="ml-2 font-medium text-blue-600">
+                Duplicate Trip
+              </Text>
             </Button>
-            
+
             <Button
               variant="outline"
               onPress={() => handleLifecycleAction('delete')}
               className="flex-row items-center justify-center border-red-200"
             >
               <Trash2 width={16} height={16} color="#DC2626" />
-              <Text className="text-red-600 font-medium ml-2">Delete Trip</Text>
+              <Text className="ml-2 font-medium text-red-600">Delete Trip</Text>
             </Button>
           </View>
         </View>
       )}
 
       {/* Status Timeline */}
-      <View className="px-4 py-4">
-        <Text className="text-sm font-medium text-gray-700 mb-3">Status Timeline</Text>
+      <View className="p-4">
+        <Text className="mb-3 text-sm font-medium text-gray-700">
+          Status Timeline
+        </Text>
         <View className="space-y-3">
           {Object.entries(statusConfig).map(([status, config], index) => {
             const isActive = trip.status === status;
-            const isPast = getStatusProgress(status as TripStatus) < statusProgress && trip.status !== 'CANCELLED';
-            const isFuture = getStatusProgress(status as TripStatus) > statusProgress && status !== 'CANCELLED';
-            
+            const isPast =
+              getStatusProgress(status as TripStatus) < statusProgress &&
+              trip.status !== 'CANCELLED';
+            const isFuture =
+              getStatusProgress(status as TripStatus) > statusProgress &&
+              status !== 'CANCELLED';
+
             return (
               <View key={status} className="flex-row items-center">
-                <View className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
-                  isActive ? config.color : isPast ? 'bg-green-100' : 'bg-gray-100'
-                }`}>
+                <View
+                  className={`mr-3 flex size-6 items-center justify-center rounded-full ${
+                    isActive
+                      ? config.color
+                      : isPast
+                        ? 'bg-green-100'
+                        : 'bg-gray-100'
+                  }`}
+                >
                   {isPast ? (
                     <CheckCircle width={14} height={14} color="#059669" />
                   ) : isActive ? (
                     React.cloneElement(config.icon, { width: 14, height: 14 })
                   ) : (
-                    <View className="w-2 h-2 bg-gray-400 rounded-full" />
+                    <View className="size-2 rounded-full bg-gray-400" />
                   )}
                 </View>
                 <View className="flex-1">
-                  <Text className={`text-sm ${isActive ? 'font-semibold text-gray-900' : 'text-gray-600'}`}>
+                  <Text
+                    className={`text-sm ${isActive ? 'font-semibold text-gray-900' : 'text-gray-600'}`}
+                  >
                     {config.label}
                   </Text>
                   {isActive && (
-                    <Text className="text-xs text-gray-500">{config.description}</Text>
+                    <Text className="text-xs text-gray-500">
+                      {config.description}
+                    </Text>
                   )}
                 </View>
               </View>

@@ -43,18 +43,21 @@ client.interceptors.request.use(
     console.log('🌐 Base URL:', config.baseURL);
     console.log('🎯 Request URL:', config.url);
     console.log('📋 Method:', config.method?.toUpperCase());
-    
+
     // Token retrieval and debugging
     console.log('🔍 Getting token...');
     const token = getToken();
     console.log('🔑 Token exists:', !!token);
-    
+
     if (token) {
       console.log('📊 Token structure:', Object.keys(token));
       console.log('🔐 Access token length:', token.access?.length || 0);
       console.log('🔄 Refresh token length:', token.refresh?.length || 0);
-      console.log('🎫 Access token preview:', token.access?.substring(0, 50) + '...');
-      
+      console.log(
+        '🎫 Access token preview:',
+        token.access?.substring(0, 50) + '...'
+      );
+
       if (token.access) {
         config.headers.Authorization = `Bearer ${token.access}`;
         console.log('✅ Authorization header set');
@@ -72,14 +75,17 @@ client.interceptors.request.use(
 
     // Log final headers
     console.log('📤 Final headers:', {
-      Authorization: config.headers.Authorization ? 'Bearer [TOKEN]' : 'NOT SET',
+      Authorization: config.headers.Authorization
+        ? 'Bearer [TOKEN]'
+        : 'NOT SET',
       'Content-Type': config.headers['Content-Type'],
       'X-Request-ID': config.headers['X-Request-ID'],
       ...Object.fromEntries(
-        Object.entries(config.headers).filter(([key]) => 
-          !['Authorization', 'Content-Type', 'X-Request-ID'].includes(key)
+        Object.entries(config.headers).filter(
+          ([key]) =>
+            !['Authorization', 'Content-Type', 'X-Request-ID'].includes(key)
         )
-      )
+      ),
     });
 
     console.log('🏁 === REQUEST INTERCEPTOR END ===\n');
@@ -103,27 +109,27 @@ client.interceptors.response.use(
     console.log('📊 Status:', response.status);
     console.log('📥 Success:', response.data?.success);
     console.log('🏷️ Request ID:', response.config.headers['X-Request-ID']);
-    
+
     if (response.data?.data) {
       console.log('📦 Data keys:', Object.keys(response.data.data));
     }
     if (response.data?.error) {
       console.log('⚠️ Error in success response:', response.data.error);
     }
-    
+
     console.log('🏁 === END RESPONSE SUCCESS ===\n');
     return response;
   },
   async (error: AxiosError<ApiResponse>) => {
     console.log('\n🚨 === RESPONSE INTERCEPTOR ERROR ===');
-    
+
     const originalRequest = error.config as RetryAxiosRequestConfig;
-    
+
     console.log('🎯 Failed URL:', originalRequest?.url);
     console.log('📊 Error Status:', error.response?.status);
     console.log('🏷️ Request ID:', originalRequest?.headers?.['X-Request-ID']);
     console.log('🔄 Is Retry:', !!originalRequest?._retry);
-    
+
     if (error.response) {
       console.log('📥 Error Response Data:', error.response.data);
       console.log('📋 Response Headers:', error.response.headers);
@@ -143,16 +149,16 @@ client.interceptors.response.use(
       try {
         console.log('🔍 Getting refresh token...');
         const token = getToken();
-        
+
         if (token?.refresh) {
           console.log('🔄 Refresh token available, attempting refresh...');
           const refreshResponse = await refreshToken(token.refresh);
-          
+
           console.log('📊 Refresh response:', refreshResponse);
-          
+
           if (refreshResponse.success && refreshResponse.data) {
             console.log('✅ Token refresh successful');
-            
+
             // Update stored token
             const { setToken } = await import('@/lib/auth/utils');
             setToken(refreshResponse.data);
@@ -161,11 +167,11 @@ client.interceptors.response.use(
             // Retry original request
             originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.access}`;
             console.log('🔁 Retrying original request with new token...');
-            
+
             const retryResult = await client(originalRequest);
             console.log('✅ Retry successful');
             console.log('🏁 === END TOKEN REFRESH SUCCESS ===\n');
-            
+
             return retryResult;
           } else {
             console.error('❌ Refresh response unsuccessful:', refreshResponse);
@@ -175,11 +181,11 @@ client.interceptors.response.use(
         }
       } catch (refreshError) {
         console.error('❌ Token refresh failed:', refreshError);
-        
+
         // Refresh failed, sign out user
         console.log('🧹 Clearing tokens due to refresh failure...');
         removeToken();
-        
+
         console.log('🏁 === END TOKEN REFRESH FAILURE ===\n');
         throw new AuthenticationError('Session expired. Please sign in again.');
       }
@@ -244,7 +250,7 @@ client.interceptors.response.use(
 async function refreshToken(refreshToken: string): Promise<ApiResponse> {
   console.log('🔄 Calling refresh endpoint...');
   console.log('🌐 Refresh URL:', `${Env.API_URL}/api/v2/auth/refresh`);
-  
+
   const response = await axios.post<ApiResponse>(
     `${Env.API_URL}/api/v2/auth/refresh`,
     { refreshToken },
@@ -253,10 +259,10 @@ async function refreshToken(refreshToken: string): Promise<ApiResponse> {
       timeout: 10000,
     }
   );
-  
+
   console.log('📊 Refresh response status:', response.status);
   console.log('📥 Refresh response data:', response.data);
-  
+
   return response.data;
 }
 

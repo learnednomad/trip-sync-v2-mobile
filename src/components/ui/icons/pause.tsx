@@ -7,7 +7,11 @@ interface PauseProps {
   color?: string;
 }
 
-export function Pause({ width = 24, height = 24, color = 'currentColor' }: PauseProps) {
+export function Pause({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: PauseProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

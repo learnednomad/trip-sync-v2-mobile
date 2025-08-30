@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { SvgProps } from 'react-native-svg';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 export function MapPin({ color = '#000', ...props }: SvgProps) {
   return (
@@ -10,13 +10,7 @@ export function MapPin({ color = '#000', ...props }: SvgProps) {
         stroke={color}
         strokeWidth={2}
       />
-      <Circle
-        cx={12}
-        cy={10}
-        r={3}
-        stroke={color}
-        strokeWidth={2}
-      />
+      <Circle cx={12} cy={10} r={3} stroke={color} strokeWidth={2} />
     </Svg>
   );
 }

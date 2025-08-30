@@ -7,7 +7,11 @@ interface MoreHorizontalProps {
   color?: string;
 }
 
-export function MoreHorizontal({ width = 24, height = 24, color = 'currentColor' }: MoreHorizontalProps) {
+export function MoreHorizontal({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: MoreHorizontalProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Circle cx={12} cy={12} r={1} fill={color} />

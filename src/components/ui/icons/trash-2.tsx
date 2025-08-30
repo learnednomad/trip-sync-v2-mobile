@@ -7,7 +7,11 @@ interface Trash2Props {
   color?: string;
 }
 
-export function Trash2({ width = 24, height = 24, color = 'currentColor' }: Trash2Props) {
+export function Trash2({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: Trash2Props) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

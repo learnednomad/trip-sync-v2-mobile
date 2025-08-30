@@ -4,25 +4,31 @@
  * Acceptance Criteria: Trip Dashboard & Overview, Advanced Search & Filtering
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { View, ScrollView, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
-import { Plus, Grid, List } from '@/components/ui/icons';
+import React, { useCallback, useMemo, useState } from 'react';
+import { RefreshControl, ScrollView, View } from 'react-native';
 
-import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
+import type { CreateTripRequest, TripListParams } from '@/api/trips/types';
+import { useTrips } from '@/api/trips/use-trips';
+import { QuickActions } from '@/components/trips/QuickActions';
+import { QuickPlanModal } from '@/components/trips/QuickPlanModal';
+import { SavedSearches } from '@/components/trips/SavedSearches';
+import {
+  SearchFilters,
+  type SearchFilters as SearchFiltersType,
+} from '@/components/trips/SearchFilters';
 import { TripCard } from '@/components/trips/TripCard';
 import { TripFilters } from '@/components/trips/TripFilters';
-import { SearchFilters, type SearchFilters as SearchFiltersType } from '@/components/trips/SearchFilters';
-import { SavedSearches } from '@/components/trips/SavedSearches';
-import { QuickActions } from '@/components/trips/QuickActions';
-import { TripTemplates, type TripTemplate } from '@/components/trips/TripTemplates';
-import { QuickPlanModal } from '@/components/trips/QuickPlanModal';
+import {
+  type TripTemplate,
+  TripTemplates,
+} from '@/components/trips/TripTemplates';
+import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Grid, List, Plus } from '@/components/ui/icons';
 import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
+import { Text } from '@/components/ui/text';
 import { useSearchDebounce } from '@/hooks/use-debounced-search';
-import { useTrips } from '@/api/trips/use-trips';
-import type { TripListParams, TripStatus, CreateTripRequest } from '@/api/trips/types';
 
 type ViewMode = 'grid' | 'list';
 
@@ -39,12 +45,12 @@ export default function TripsScreen() {
   const [searchFilters, setSearchFilters] = useState<SearchFiltersType>({});
 
   // Debounced search functionality
-  const { 
-    searchTerm, 
-    debouncedSearchTerm, 
-    isSearching, 
-    setSearchTerm, 
-    clearSearch 
+  const {
+    searchTerm,
+    debouncedSearchTerm,
+    isSearching,
+    setSearchTerm,
+    clearSearch,
   } = useSearchDebounce('', { delay: 300, minLength: 1 });
 
   // Combine filters with search query and search filters
@@ -55,14 +61,18 @@ export default function TripsScreen() {
     };
 
     // Efficiently merge search filters, filtering out undefined values
-    const searchFilterEntries = Object.entries(searchFilters).filter(([_, value]) => value != null);
+    const searchFilterEntries = Object.entries(searchFilters).filter(
+      ([_, value]) => value != null
+    );
     const validSearchFilters = Object.fromEntries(searchFilterEntries);
 
-    return { 
-      ...baseParams, 
+    return {
+      ...baseParams,
       ...validSearchFilters,
       // Ensure proper typing for tripType
-      ...(validSearchFilters.tripType && { tripType: validSearchFilters.tripType as any })
+      ...(validSearchFilters.tripType && {
+        tripType: validSearchFilters.tripType as any,
+      }),
     };
   }, [filters, debouncedSearchTerm, searchFilters]);
 
@@ -86,9 +96,12 @@ export default function TripsScreen() {
     router.push(`/trips/${tripId}`);
   }, []);
 
-  const handleFilterChange = useCallback((newFilters: Partial<TripListParams>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-  }, []);
+  const handleFilterChange = useCallback(
+    (newFilters: Partial<TripListParams>) => {
+      setFilters((prev) => ({ ...prev, ...newFilters }));
+    },
+    []
+  );
 
   const handleClearFilters = useCallback(() => {
     setFilters({
@@ -100,9 +113,12 @@ export default function TripsScreen() {
     setSearchFilters({});
   }, [clearSearch]);
 
-  const handleSearchFiltersChange = useCallback((newSearchFilters: Partial<SearchFiltersType>) => {
-    setSearchFilters(prev => ({ ...prev, ...newSearchFilters }));
-  }, []);
+  const handleSearchFiltersChange = useCallback(
+    (newSearchFilters: Partial<SearchFiltersType>) => {
+      setSearchFilters((prev) => ({ ...prev, ...newSearchFilters }));
+    },
+    []
+  );
 
   const handleClearSearchFilters = useCallback(() => {
     setSearchFilters({});
@@ -125,11 +141,14 @@ export default function TripsScreen() {
     // Show success toast or feedback
   };
 
-  const handleTemplateSelect = (template: TripTemplate, customizations?: any) => {
+  const handleTemplateSelect = (
+    template: TripTemplate,
+    customizations?: any
+  ) => {
     // Convert template to CreateTripRequest format
     const tripData: Partial<CreateTripRequest> = {
-      name: customizations?.destination 
-        ? `${template.name} - ${customizations.destination}` 
+      name: customizations?.destination
+        ? `${template.name} - ${customizations.destination}`
         : template.name,
       description: template.description,
       tripType: template.tripType,
@@ -141,7 +160,7 @@ export default function TripsScreen() {
     // Navigate to create trip with pre-filled data
     router.push({
       pathname: '/trips/create',
-      params: { templateData: JSON.stringify(tripData) }
+      params: { templateData: JSON.stringify(tripData) },
     });
   };
 
@@ -160,7 +179,7 @@ export default function TripsScreen() {
     // Navigate to create trip with pre-filled data
     router.push({
       pathname: '/trips/create',
-      params: { planData: JSON.stringify(tripData) }
+      params: { planData: JSON.stringify(tripData) },
     });
   };
 
@@ -179,7 +198,7 @@ export default function TripsScreen() {
 
       router.push({
         pathname: '/trips/create',
-        params: { duplicateData: JSON.stringify(duplicateData) }
+        params: { duplicateData: JSON.stringify(duplicateData) },
       });
     }
   };
@@ -187,7 +206,7 @@ export default function TripsScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-white">
-        <View className="px-4 py-6 border-b border-gray-100">
+        <View className="border-b border-gray-100 px-4 py-6">
           <Text className="text-2xl font-bold text-gray-900">My Trips</Text>
         </View>
         <ScrollView className="flex-1 px-4 py-6">
@@ -200,10 +219,10 @@ export default function TripsScreen() {
   if (isError) {
     return (
       <View className="flex-1 bg-white">
-        <View className="px-4 py-6 border-b border-gray-100">
+        <View className="border-b border-gray-100 px-4 py-6">
           <Text className="text-2xl font-bold text-gray-900">My Trips</Text>
         </View>
-        <View className="flex-1 justify-center items-center px-4">
+        <View className="flex-1 items-center justify-center px-4">
           <EmptyState
             icon="alert-circle"
             title="Failed to Load Trips"
@@ -221,16 +240,12 @@ export default function TripsScreen() {
   return (
     <View className="flex-1 bg-white">
       {/* Header */}
-      <View className="px-4 py-6 border-b border-gray-100">
-        <View className="flex-row items-center justify-between mb-4">
+      <View className="border-b border-gray-100 px-4 py-6">
+        <View className="mb-4 flex-row items-center justify-between">
           <Text className="text-2xl font-bold text-gray-900">My Trips</Text>
-          <Button
-            onPress={handleCreateTrip}
-            size="sm"
-            className="bg-blue-600"
-          >
+          <Button onPress={handleCreateTrip} size="sm" className="bg-blue-600">
             <Plus width={16} height={16} color="white" />
-            <Text className="text-white font-medium ml-2">Create Trip</Text>
+            <Text className="ml-2 font-medium text-white">Create Trip</Text>
           </Button>
         </View>
 
@@ -242,18 +257,24 @@ export default function TripsScreen() {
             onPress={() => setShowFilters(!showFilters)}
             className={showFilters ? 'border-blue-600' : ''}
           >
-            <Text className={`text-sm ${showFilters ? 'text-blue-600' : 'text-gray-600'}`}>
+            <Text
+              className={`text-sm ${showFilters ? 'text-blue-600' : 'text-gray-600'}`}
+            >
               {showFilters ? 'Hide' : 'Show'} Filters
             </Text>
           </Button>
-          <View className="flex-row border border-gray-200 rounded-lg overflow-hidden">
+          <View className="flex-row overflow-hidden rounded-lg border border-gray-200">
             <Button
               variant="ghost"
               size="sm"
               onPress={() => setViewMode('grid')}
               className={`border-0 ${viewMode === 'grid' ? 'bg-gray-100' : ''}`}
             >
-              <Grid width={16} height={16} color={viewMode === 'grid' ? '#2563EB' : '#6B7280'} />
+              <Grid
+                width={16}
+                height={16}
+                color={viewMode === 'grid' ? '#2563EB' : '#6B7280'}
+              />
             </Button>
             <Button
               variant="ghost"
@@ -261,7 +282,11 @@ export default function TripsScreen() {
               onPress={() => setViewMode('list')}
               className={`border-0 ${viewMode === 'list' ? 'bg-gray-100' : ''}`}
             >
-              <List width={16} height={16} color={viewMode === 'list' ? '#2563EB' : '#6B7280'} />
+              <List
+                width={16}
+                height={16}
+                color={viewMode === 'list' ? '#2563EB' : '#6B7280'}
+              />
             </Button>
           </View>
         </View>
@@ -286,8 +311,8 @@ export default function TripsScreen() {
 
       {/* Search Status */}
       {isSearching && (
-        <View className="px-4 py-2 bg-blue-50 border-b border-blue-100">
-          <Text className="text-blue-600 text-sm">Searching...</Text>
+        <View className="border-b border-blue-100 bg-blue-50 px-4 py-2">
+          <Text className="text-sm text-blue-600">Searching...</Text>
         </View>
       )}
 
@@ -322,7 +347,7 @@ export default function TripsScreen() {
         }
       >
         {!hasTrips ? (
-          <View className="flex-1 justify-center items-center px-4 py-12">
+          <View className="flex-1 items-center justify-center px-4 py-12">
             <EmptyState
               icon="map"
               title="No Trips Yet"
@@ -334,8 +359,10 @@ export default function TripsScreen() {
             />
           </View>
         ) : (
-          <View className={`p-4 ${viewMode === 'grid' ? 'flex-row flex-wrap' : ''}`}>
-            {trips.map(trip => (
+          <View
+            className={`p-4 ${viewMode === 'grid' ? 'flex-row flex-wrap' : ''}`}
+          >
+            {trips.map((trip) => (
               <TripCard
                 key={trip.id}
                 trip={trip}

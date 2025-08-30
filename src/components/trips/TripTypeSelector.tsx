@@ -5,18 +5,18 @@
  */
 
 import React from 'react';
-import { View, Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
+
 import {
   Briefcase,
-  Heart,
-  Users,
-  Mountain,
-  GraduationCap,
-  Palette,
-  Flower,
   Building,
+  Flower,
+  GraduationCap,
+  Heart,
+  Mountain,
+  Palette,
+  Users,
 } from '@/components/ui/icons';
-
 import { Text } from '@/components/ui/text';
 
 export type TripType =
@@ -121,11 +121,11 @@ interface TripTypeSelectorProps {
   className?: string;
 }
 
-export function TripTypeSelector({ 
-  selectedType, 
-  onTypeSelect, 
+export function TripTypeSelector({
+  selectedType,
+  onTypeSelect,
   error,
-  className = '' 
+  className = '',
 }: TripTypeSelectorProps) {
   return (
     <View className={className}>
@@ -139,30 +139,35 @@ export function TripTypeSelector({
               key={option.type}
               onPress={() => onTypeSelect(option.type)}
               className={`
-                p-4 rounded-xl border-2 flex-row items-center
-                ${isSelected 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : `${option.borderColor} ${option.bgColor}`
+                flex-row items-center rounded-xl border-2 p-4
+                ${
+                  isSelected
+                    ? 'border-blue-500 bg-blue-50'
+                    : `${option.borderColor} ${option.bgColor}`
                 }
               `}
               android_ripple={{ color: '#f3f4f6' }}
             >
               <View className="mr-3">
-                <IconComponent 
-                  size={24} 
+                <IconComponent
+                  size={24}
                   color={isSelected ? '#2563EB' : option.color}
                 />
               </View>
-              
+
               <View className="flex-1">
-                <Text className={`font-semibold text-base ${
-                  isSelected ? 'text-blue-900' : 'text-gray-900'
-                }`}>
+                <Text
+                  className={`text-base font-semibold ${
+                    isSelected ? 'text-blue-900' : 'text-gray-900'
+                  }`}
+                >
                   {option.label}
                 </Text>
-                <Text className={`text-xs mt-1 ${
-                  isSelected ? 'text-blue-700' : 'text-gray-600'
-                }`}>
+                <Text
+                  className={`mt-1 text-xs ${
+                    isSelected ? 'text-blue-700' : 'text-gray-600'
+                  }`}
+                >
                   {option.description}
                 </Text>
               </View>
@@ -171,11 +176,7 @@ export function TripTypeSelector({
         })}
       </View>
 
-      {error && (
-        <Text className="text-red-600 text-sm mt-2">
-          {error}
-        </Text>
-      )}
+      {error && <Text className="mt-2 text-sm text-red-600">{error}</Text>}
     </View>
   );
 }

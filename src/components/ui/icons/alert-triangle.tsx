@@ -7,7 +7,11 @@ interface AlertTriangleProps {
   color?: string;
 }
 
-export function AlertTriangle({ width = 24, height = 24, color = 'currentColor' }: AlertTriangleProps) {
+export function AlertTriangle({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: AlertTriangleProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

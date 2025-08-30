@@ -3,11 +3,19 @@
  * Add this to your app temporarily to test authentication
  */
 
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import { setToken } from './utils';
-import { AuthDebugger } from './debug-utils';
 import { Env } from '@env';
+import React, { useState } from 'react';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import { AuthDebugger } from './debug-utils';
+import { setToken } from './utils';
 
 export const TestLogin: React.FC = () => {
   const [email, setEmail] = useState('test@example.com');
@@ -17,38 +25,38 @@ export const TestLogin: React.FC = () => {
   const handleTestLogin = async () => {
     setLoading(true);
     console.log('🧪 Starting test login...');
-    
+
     try {
       // Test API connectivity first
       await AuthDebugger.testApiConnectivity();
-      
+
       // Attempt login
       const response = await fetch(`${Env.API_URL}/api/v2/auth/login`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'X-Request-ID': `test-login-${Date.now()}`
+          'X-Request-ID': `test-login-${Date.now()}`,
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
-      
+
       console.log('🔐 Login response status:', response.status);
       const data = await response.json();
       console.log('📥 Login response data:', data);
-      
+
       if (data.success && data.data?.session) {
         // Store tokens
         const tokens = {
           access: data.data.session.accessToken,
-          refresh: data.data.session.refreshToken
+          refresh: data.data.session.refreshToken,
         };
-        
+
         setToken(tokens);
         console.log('✅ Tokens stored successfully');
-        
+
         // Verify storage
         AuthDebugger.diagnoseToken();
-        
+
         Alert.alert('Success', 'Login successful! Now try your API call.');
       } else {
         console.error('❌ Login failed:', data.error);
@@ -64,14 +72,14 @@ export const TestLogin: React.FC = () => {
 
   const handleTestApiCall = async () => {
     console.log('🧪 Testing authenticated API call...');
-    
+
     // Run diagnostics first
     AuthDebugger.diagnoseToken();
-    
+
     try {
       // Import the client here to use current token
       const { client } = await import('@/api/common/client');
-      
+
       const response = await client.get('/api/v2/trips');
       console.log('✅ API call successful:', response.data);
       Alert.alert('Success', 'API call worked!');
@@ -94,7 +102,7 @@ export const TestLogin: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🧪 Authentication Debugger</Text>
-      
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Test Login</Text>
         <TextInput
@@ -112,8 +120,8 @@ export const TestLogin: React.FC = () => {
           onChangeText={setPassword}
           secureTextEntry
         />
-        <TouchableOpacity 
-          style={[styles.button, loading && styles.buttonDisabled]} 
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleTestLogin}
           disabled={loading}
         >
@@ -135,7 +143,10 @@ export const TestLogin: React.FC = () => {
         <TouchableOpacity style={styles.button} onPress={handleRunDiagnostics}>
           <Text style={styles.buttonText}>🔍 Run Diagnostics</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.buttonDanger]} onPress={handleClearAuth}>
+        <TouchableOpacity
+          style={[styles.button, styles.buttonDanger]}
+          onPress={handleClearAuth}
+        >
           <Text style={styles.buttonText}>🧹 Clear Auth Data</Text>
         </TouchableOpacity>
       </View>

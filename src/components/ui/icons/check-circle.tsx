@@ -7,7 +7,11 @@ interface CheckCircleProps {
   color?: string;
 }
 
-export function CheckCircle({ width = 24, height = 24, color = 'currentColor' }: CheckCircleProps) {
+export function CheckCircle({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: CheckCircleProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

@@ -7,7 +7,11 @@ interface PlayProps {
   color?: string;
 }
 
-export function Play({ width = 24, height = 24, color = 'currentColor' }: PlayProps) {
+export function Play({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: PlayProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

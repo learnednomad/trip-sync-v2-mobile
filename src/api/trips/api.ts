@@ -15,6 +15,7 @@ import type {
   TripDetailApiResponse,
   TripListApiResponse,
   TripListParams,
+  TripParticipantsApiResponse,
   UpdateParticipantApiResponse,
   UpdateParticipantRequest,
   UpdateTripApiResponse,
@@ -121,6 +122,18 @@ export const updateParticipant = async (
   const response = await client.put<UpdateParticipantApiResponse>(
     `${TRIPS_BASE}/${tripId}/participants/${userId}`,
     data
+  );
+  return response.data;
+};
+
+/**
+ * Get trip participants
+ */
+export const getTripParticipants = async (
+  tripId: string
+): Promise<TripParticipantsApiResponse> => {
+  const response = await client.get<TripParticipantsApiResponse>(
+    `${TRIPS_BASE}/${tripId}/participants`
   );
   return response.data;
 };

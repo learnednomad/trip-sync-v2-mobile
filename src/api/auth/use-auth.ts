@@ -106,20 +106,26 @@ export const useLogin = () => {
     mutationFn: (data: LoginRequest) => authApi.login(data),
     onSuccess: (response) => {
       console.log('🔍 Full login response:', JSON.stringify(response, null, 2));
-      
+
       if (response.success && response.data) {
         console.log('📊 Tokens structure:', response.data.tokens);
-        console.log('🔑 Available token fields:', Object.keys(response.data.tokens || {}));
-        
+        console.log(
+          '🔑 Available token fields:',
+          Object.keys(response.data.tokens || {})
+        );
+
         // Enhanced token extraction - handles multiple possible field names
         const tokens = response.data.tokens;
-        const accessToken = tokens?.access || tokens?.accessToken || tokens?.token;
-        const refreshToken = tokens?.refresh || tokens?.refreshToken;
-        
+        const accessToken =
+          tokens?.access ||
+          (tokens as any)?.accessToken ||
+          (tokens as any)?.token;
+        const refreshToken = tokens?.refresh || (tokens as any)?.refreshToken;
+
         console.log('🎯 Extracted tokens:');
         console.log('  - Access token length:', accessToken?.length || 0);
         console.log('  - Refresh token length:', refreshToken?.length || 0);
-        
+
         if (accessToken && refreshToken) {
           // Sign in user with returned tokens
           authSignIn({
@@ -129,7 +135,10 @@ export const useLogin = () => {
           console.log('✅ Tokens stored successfully via authSignIn');
         } else {
           console.error('❌ Could not extract valid tokens from response');
-          console.error('Available fields:', tokens ? Object.keys(tokens) : 'No tokens object');
+          console.error(
+            'Available fields:',
+            tokens ? Object.keys(tokens) : 'No tokens object'
+          );
         }
 
         // Cache user data
@@ -187,7 +196,7 @@ export const useLogout = () => {
 /**
  * Request password reset
  */
-export const usePasswordReset = () => {
+export const useForgotPassword = () => {
   return useMutation({
     mutationFn: (data: PasswordResetRequest) =>
       authApi.requestPasswordReset(data),
@@ -201,6 +210,9 @@ export const usePasswordReset = () => {
     },
   });
 };
+
+// Alias for backwards compatibility
+export const usePasswordReset = useForgotPassword;
 
 /**
  * Verify token validity

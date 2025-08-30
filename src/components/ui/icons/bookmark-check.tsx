@@ -7,7 +7,11 @@ interface BookmarkCheckProps {
   color?: string;
 }
 
-export function BookmarkCheck({ width = 24, height = 24, color = 'currentColor' }: BookmarkCheckProps) {
+export function BookmarkCheck({
+  width = 24,
+  height = 24,
+  color = 'currentColor',
+}: BookmarkCheckProps) {
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
       <Path

@@ -4,13 +4,15 @@
  * Custom date picker with range selection support
  */
 
+import DateTimePicker, {
+  type DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
-import { View, Pressable, Modal, Platform } from 'react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { Calendar, ChevronRight } from '@/components/ui/icons';
+import { Modal, Platform, Pressable, View } from 'react-native';
 
-import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
+import { Calendar, ChevronRight } from '@/components/ui/icons';
+import { Text } from '@/components/ui/text';
 import { formatDate } from '@/lib/utils/date';
 
 interface DatePickerProps {
@@ -45,7 +47,10 @@ export function DatePicker({
   const maxDate = new Date();
   maxDate.setFullYear(maxDate.getFullYear() + 2);
 
-  const handleStartDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  const handleStartDateChange = (
+    event: DateTimePickerEvent,
+    selectedDate?: Date
+  ) => {
     if (Platform.OS === 'android') {
       setShowStartPicker(false);
     }
@@ -54,7 +59,7 @@ export function DatePicker({
       setTempStartDate(selectedDate);
       if (Platform.OS === 'android') {
         onStartDateChange(selectedDate.toISOString());
-        
+
         // Auto-adjust end date if it's before start date
         if (endDate && new Date(endDate) <= selectedDate) {
           const newEndDate = new Date(selectedDate);
@@ -65,7 +70,10 @@ export function DatePicker({
     }
   };
 
-  const handleEndDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  const handleEndDateChange = (
+    event: DateTimePickerEvent,
+    selectedDate?: Date
+  ) => {
     if (Platform.OS === 'android') {
       setShowEndPicker(false);
     }
@@ -81,7 +89,7 @@ export function DatePicker({
   const confirmStartDate = () => {
     onStartDateChange(tempStartDate.toISOString());
     setShowStartPicker(false);
-    
+
     // Auto-adjust end date if it's before start date
     if (endDate && new Date(endDate) <= tempStartDate) {
       const newEndDate = new Date(tempStartDate);
@@ -123,62 +131,70 @@ export function DatePicker({
       <View className="space-y-4">
         {/* Start Date */}
         <View>
-          <Text className="text-sm font-medium text-gray-700 mb-2">
+          <Text className="mb-2 text-sm font-medium text-gray-700">
             Start Date
           </Text>
           <Pressable
             onPress={() => setShowStartPicker(true)}
             className={`
-              flex-row items-center justify-between bg-white border rounded-lg px-4 py-3
+              flex-row items-center justify-between rounded-lg border bg-white px-4 py-3
               ${startDateError ? 'border-red-500' : 'border-gray-300'}
             `}
             android_ripple={{ color: '#f3f4f6' }}
           >
-            <View className="flex-row items-center flex-1">
+            <View className="flex-1 flex-row items-center">
               <Calendar width={20} height={20} color="#6B7280" />
-              <Text className={`ml-3 ${startDate ? 'text-gray-900' : 'text-gray-500'}`}>
-                {startDate ? formatDate(startDate, 'EEEE, MMMM d, yyyy') : 'Select start date'}
+              <Text
+                className={`ml-3 ${startDate ? 'text-gray-900' : 'text-gray-500'}`}
+              >
+                {startDate
+                  ? formatDate(startDate, 'EEEE, MMMM d, yyyy')
+                  : 'Select start date'}
               </Text>
             </View>
             <ChevronRight width={20} height={20} color="#6B7280" />
           </Pressable>
-          
+
           {startDateError && (
-            <Text className="text-red-600 text-sm mt-1">{startDateError}</Text>
+            <Text className="mt-1 text-sm text-red-600">{startDateError}</Text>
           )}
         </View>
 
         {/* End Date */}
         <View>
-          <Text className="text-sm font-medium text-gray-700 mb-2">
+          <Text className="mb-2 text-sm font-medium text-gray-700">
             End Date
           </Text>
           <Pressable
             onPress={() => setShowEndPicker(true)}
             className={`
-              flex-row items-center justify-between bg-white border rounded-lg px-4 py-3
+              flex-row items-center justify-between rounded-lg border bg-white px-4 py-3
               ${endDateError ? 'border-red-500' : 'border-gray-300'}
             `}
             android_ripple={{ color: '#f3f4f6' }}
           >
-            <View className="flex-row items-center flex-1">
+            <View className="flex-1 flex-row items-center">
               <Calendar width={20} height={20} color="#6B7280" />
-              <Text className={`ml-3 ${endDate ? 'text-gray-900' : 'text-gray-500'}`}>
-                {endDate ? formatDate(endDate, 'EEEE, MMMM d, yyyy') : 'Select end date'}
+              <Text
+                className={`ml-3 ${endDate ? 'text-gray-900' : 'text-gray-500'}`}
+              >
+                {endDate
+                  ? formatDate(endDate, 'EEEE, MMMM d, yyyy')
+                  : 'Select end date'}
               </Text>
             </View>
             <ChevronRight width={20} height={20} color="#6B7280" />
           </Pressable>
-          
+
           {endDateError && (
-            <Text className="text-red-600 text-sm mt-1">{endDateError}</Text>
+            <Text className="mt-1 text-sm text-red-600">{endDateError}</Text>
           )}
         </View>
 
         {/* Duration Display */}
         {duration && (
-          <View className="bg-blue-50 px-4 py-3 rounded-lg">
-            <Text className="text-blue-800 font-medium text-center">
+          <View className="rounded-lg bg-blue-50 px-4 py-3">
+            <Text className="text-center font-medium text-blue-800">
               Duration: {duration} {duration === 1 ? 'day' : 'days'}
             </Text>
           </View>
@@ -196,20 +212,19 @@ export function DatePicker({
               onRequestClose={() => setShowStartPicker(false)}
             >
               <View className="flex-1 justify-end bg-black/50">
-                <View className="bg-white rounded-t-xl">
-                  <View className="flex-row justify-between items-center p-4 border-b border-gray-200">
+                <View className="rounded-t-xl bg-white">
+                  <View className="flex-row items-center justify-between border-b border-gray-200 p-4">
                     <Button
                       variant="ghost"
                       onPress={() => setShowStartPicker(false)}
                     >
                       <Text className="text-blue-600">Cancel</Text>
                     </Button>
-                    <Text className="font-semibold text-lg">Select Start Date</Text>
-                    <Button
-                      variant="ghost"
-                      onPress={confirmStartDate}
-                    >
-                      <Text className="text-blue-600 font-semibold">Done</Text>
+                    <Text className="text-lg font-semibold">
+                      Select Start Date
+                    </Text>
+                    <Button variant="ghost" onPress={confirmStartDate}>
+                      <Text className="font-semibold text-blue-600">Done</Text>
                     </Button>
                   </View>
                   <DateTimePicker
@@ -248,20 +263,19 @@ export function DatePicker({
               onRequestClose={() => setShowEndPicker(false)}
             >
               <View className="flex-1 justify-end bg-black/50">
-                <View className="bg-white rounded-t-xl">
-                  <View className="flex-row justify-between items-center p-4 border-b border-gray-200">
+                <View className="rounded-t-xl bg-white">
+                  <View className="flex-row items-center justify-between border-b border-gray-200 p-4">
                     <Button
                       variant="ghost"
                       onPress={() => setShowEndPicker(false)}
                     >
                       <Text className="text-blue-600">Cancel</Text>
                     </Button>
-                    <Text className="font-semibold text-lg">Select End Date</Text>
-                    <Button
-                      variant="ghost"
-                      onPress={confirmEndDate}
-                    >
-                      <Text className="text-blue-600 font-semibold">Done</Text>
+                    <Text className="text-lg font-semibold">
+                      Select End Date
+                    </Text>
+                    <Button variant="ghost" onPress={confirmEndDate}>
+                      <Text className="font-semibold text-blue-600">Done</Text>
                     </Button>
                   </View>
                   <DateTimePicker

@@ -26,6 +26,7 @@ describe('Trip Management API Integration', () => {
         name: 'European Adventure',
         description: 'A 2-week trip through Europe',
         destination: 'Europe',
+        tripType: 'LEISURE',
         startDate: '2023-07-01',
         endDate: '2023-07-14',
         budgetAmount: 5000,
@@ -49,8 +50,8 @@ describe('Trip Management API Integration', () => {
             budgetCurrency: 'USD',
             status: 'planning',
             settings: {
-          visibility: 'participants' as const,
-        },
+              visibility: 'participants' as const,
+            },
             createdBy: 'user-123',
             createdAt: '2023-01-01T00:00:00Z',
             updatedAt: '2023-01-01T00:00:00Z',
@@ -135,8 +136,8 @@ describe('Trip Management API Integration', () => {
             budgetCurrency: 'USD',
             status: 'planning',
             settings: {
-          visibility: 'participants' as const,
-        },
+              visibility: 'participants' as const,
+            },
             createdBy: 'user-123',
             createdAt: '2023-01-01T00:00:00Z',
             updatedAt: '2023-01-01T00:00:00Z',
@@ -185,8 +186,8 @@ describe('Trip Management API Integration', () => {
             budgetCurrency: 'USD',
             status: 'planning',
             settings: {
-          visibility: 'participants' as const,
-        },
+              visibility: 'participants' as const,
+            },
             createdBy: 'user-123',
             createdAt: '2023-01-01T00:00:00Z',
             updatedAt: '2023-01-01T01:00:00Z',
@@ -389,6 +390,7 @@ describe('Trip Management API Integration', () => {
       const createData: CreateTripRequest = {
         name: '',
         destination: '',
+        tripType: 'LEISURE',
         startDate: 'invalid-date',
         endDate: 'invalid-date',
         budgetAmount: -100,

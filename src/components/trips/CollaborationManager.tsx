@@ -5,21 +5,38 @@
  */
 
 import React, { useState } from 'react';
-import { View, ScrollView, Alert } from 'react-native';
-import { 
-  Users, UserPlus, MoreHorizontal, Crown, Shield, 
-  Eye, Trash2, Mail, CheckCircle, XCircle, Clock 
-} from '@/components/ui/icons';
+import { Alert, ScrollView, View } from 'react-native';
 
-import { Text } from '@/components/ui/text';
+import type {
+  ParticipantRole,
+  ParticipantStatus,
+  Trip,
+  TripParticipant,
+} from '@/api/trips/types';
 import { Button } from '@/components/ui/button';
+import {
+  CheckCircle,
+  Clock,
+  Crown,
+  Eye,
+  Mail,
+  MoreHorizontal,
+  Shield,
+  Trash2,
+  UserPlus,
+  Users,
+  XCircle,
+} from '@/components/ui/icons';
 import { Select } from '@/components/ui/select';
-import type { Trip, TripParticipant, ParticipantRole, ParticipantStatus } from '@/api/trips/types';
+import { Text } from '@/components/ui/text';
 
 interface CollaborationManagerProps {
   trip: Trip;
   onInviteParticipants: () => void;
-  onUpdateParticipantRole: (participantId: string, newRole: ParticipantRole) => void;
+  onUpdateParticipantRole: (
+    participantId: string,
+    newRole: ParticipantRole
+  ) => void;
   onRemoveParticipant: (participantId: string) => void;
   onResendInvitation: (participantId: string) => void;
   currentUserId: string;
@@ -96,37 +113,49 @@ export function CollaborationManager({
   onResendInvitation,
   currentUserId,
 }: CollaborationManagerProps) {
-  const [expandedParticipant, setExpandedParticipant] = useState<string | null>(null);
+  const [expandedParticipant, setExpandedParticipant] = useState<string | null>(
+    null
+  );
 
-  const currentUserParticipant = trip.participants.find(p => p.userId === currentUserId);
-  const isOwnerOrAdmin = currentUserParticipant && ['OWNER', 'ADMIN'].includes(currentUserParticipant.role);
+  const currentUserParticipant = trip.participants.find(
+    (p) => p.userId === currentUserId
+  );
+  const isOwnerOrAdmin =
+    currentUserParticipant &&
+    ['OWNER', 'ADMIN'].includes(currentUserParticipant.role);
 
   const sortedParticipants = [...trip.participants].sort((a, b) => {
     // Sort by role priority (Owner > Admin > Member > Viewer), then by name
     const roleOrder = { OWNER: 0, ADMIN: 1, MEMBER: 2, VIEWER: 3 };
     const aOrder = roleOrder[a.role] ?? 4;
     const bOrder = roleOrder[b.role] ?? 4;
-    
+
     if (aOrder !== bOrder) {
       return aOrder - bOrder;
     }
-    
+
     const aName = a.user ? `${a.user.firstName} ${a.user.lastName}` : a.userId;
     const bName = b.user ? `${b.user.firstName} ${b.user.lastName}` : b.userId;
     return aName.localeCompare(bName);
   });
 
-  const handleRoleChange = (participantId: string, newRole: ParticipantRole) => {
-    if (participantId === currentUserId && newRole !== currentUserParticipant?.role) {
+  const handleRoleChange = (
+    participantId: string,
+    newRole: ParticipantRole
+  ) => {
+    if (
+      participantId === currentUserId &&
+      newRole !== currentUserParticipant?.role
+    ) {
       Alert.alert(
         'Change Your Role',
         'Are you sure you want to change your own role? This may limit your access to trip management.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Change Role', 
+          {
+            text: 'Change Role',
             style: 'destructive',
-            onPress: () => onUpdateParticipantRole(participantId, newRole)
+            onPress: () => onUpdateParticipantRole(participantId, newRole),
           },
         ]
       );
@@ -135,16 +164,19 @@ export function CollaborationManager({
     }
   };
 
-  const handleRemoveParticipant = (participantId: string, participantName: string) => {
+  const handleRemoveParticipant = (
+    participantId: string,
+    participantName: string
+  ) => {
     Alert.alert(
       'Remove Participant',
       `Are you sure you want to remove ${participantName} from this trip?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Remove', 
+        {
+          text: 'Remove',
           style: 'destructive',
-          onPress: () => onRemoveParticipant(participantId)
+          onPress: () => onRemoveParticipant(participantId),
         },
       ]
     );
@@ -153,30 +185,34 @@ export function CollaborationManager({
   const canEditParticipant = (participant: TripParticipant) => {
     if (!isOwnerOrAdmin) return false;
     if (participant.role === 'OWNER') return false;
-    if (currentUserParticipant?.role === 'ADMIN' && participant.role === 'ADMIN') return false;
+    if (
+      currentUserParticipant?.role === 'ADMIN' &&
+      participant.role === 'ADMIN'
+    )
+      return false;
     return true;
   };
 
   return (
     <View className="bg-white">
       {/* Header */}
-      <View className="px-4 py-4 border-b border-gray-100">
+      <View className="border-b border-gray-100 p-4">
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
             <Users width={20} height={20} color="#374151" />
-            <Text className="text-lg font-semibold text-gray-900 ml-2">
+            <Text className="ml-2 text-lg font-semibold text-gray-900">
               Trip Participants ({trip.participants.length})
             </Text>
           </View>
-          
+
           {isOwnerOrAdmin && (
             <Button
               onPress={onInviteParticipants}
               size="sm"
-              className="bg-blue-600 flex-row items-center"
+              className="flex-row items-center bg-blue-600"
             >
               <UserPlus width={16} height={16} color="white" />
-              <Text className="text-white font-medium ml-2">Invite</Text>
+              <Text className="ml-2 font-medium text-white">Invite</Text>
             </Button>
           )}
         </View>
@@ -186,7 +222,7 @@ export function CollaborationManager({
       <ScrollView className="max-h-[400px]">
         {sortedParticipants.map((participant) => {
           const isExpanded = expandedParticipant === participant.id;
-          const participantName = participant.user 
+          const participantName = participant.user
             ? `${participant.user.firstName} ${participant.user.lastName}`
             : participant.userId;
           const canEdit = canEditParticipant(participant);
@@ -194,19 +230,19 @@ export function CollaborationManager({
 
           return (
             <View key={participant.id} className="border-b border-gray-100">
-              <View className="px-4 py-4">
+              <View className="p-4">
                 <View className="flex-row items-center justify-between">
                   <View className="flex-1 flex-row items-center">
                     {/* Avatar placeholder */}
-                    <View className="w-10 h-10 bg-gray-300 rounded-full mr-3 items-center justify-center">
-                      <Text className="text-gray-600 font-medium">
+                    <View className="mr-3 size-10 items-center justify-center rounded-full bg-gray-300">
+                      <Text className="font-medium text-gray-600">
                         {participantName.charAt(0).toUpperCase()}
                       </Text>
                     </View>
 
                     <View className="flex-1">
                       <View className="flex-row items-center">
-                        <Text className="font-medium text-gray-900 mr-2">
+                        <Text className="mr-2 font-medium text-gray-900">
                           {participantName}
                           {isCurrentUser && (
                             <Text className="text-blue-600"> (You)</Text>
@@ -214,20 +250,26 @@ export function CollaborationManager({
                         </Text>
                         {getStatusIcon(participant.status)}
                       </View>
-                      
-                      <View className="flex-row items-center mt-1">
-                        <View className={`px-2 py-1 rounded-full flex-row items-center mr-2 ${getRoleColor(participant.role)}`}>
+
+                      <View className="mt-1 flex-row items-center">
+                        <View
+                          className={`mr-2 flex-row items-center rounded-full px-2 py-1 ${getRoleColor(participant.role)}`}
+                        >
                           {getRoleIcon(participant.role)}
-                          <Text className="text-xs font-medium ml-1">{participant.role}</Text>
+                          <Text className="ml-1 text-xs font-medium">
+                            {participant.role}
+                          </Text>
                         </View>
-                        
-                        <View className={`px-2 py-1 rounded-full ${getStatusColor(participant.status)}`}>
+
+                        <View
+                          className={`rounded-full px-2 py-1 ${getStatusColor(participant.status)}`}
+                        >
                           <Text className="text-xs">{participant.status}</Text>
                         </View>
                       </View>
 
                       {participant.user?.email && (
-                        <Text className="text-xs text-gray-500 mt-1">
+                        <Text className="mt-1 text-xs text-gray-500">
                           {participant.user.email}
                         </Text>
                       )}
@@ -246,15 +288,23 @@ export function CollaborationManager({
                         <Mail width={16} height={16} color="#6B7280" />
                       </Button>
                     )}
-                    
+
                     {canEdit && (
                       <Button
                         variant="ghost"
                         size="sm"
-                        onPress={() => setExpandedParticipant(isExpanded ? null : participant.id)}
+                        onPress={() =>
+                          setExpandedParticipant(
+                            isExpanded ? null : participant.id
+                          )
+                        }
                         className="p-1"
                       >
-                        <MoreHorizontal width={16} height={16} color="#6B7280" />
+                        <MoreHorizontal
+                          width={16}
+                          height={16}
+                          color="#6B7280"
+                        />
                       </Button>
                     )}
                   </View>
@@ -262,17 +312,28 @@ export function CollaborationManager({
 
                 {/* Expanded Actions */}
                 {isExpanded && canEdit && (
-                  <View className="mt-4 pt-4 border-t border-gray-100">
+                  <View className="mt-4 border-t border-gray-100 pt-4">
                     <View className="space-y-3">
                       {/* Role Change */}
                       <View>
-                        <Text className="text-sm font-medium text-gray-700 mb-2">Change Role</Text>
+                        <Text className="mb-2 text-sm font-medium text-gray-700">
+                          Change Role
+                        </Text>
                         <Select
                           value={participant.role}
-                          onSelect={(value) => handleRoleChange(participant.id, value as ParticipantRole)}
-                          options={roleOptions.filter(option => {
+                          onSelect={(value) =>
+                            handleRoleChange(
+                              participant.id,
+                              value as ParticipantRole
+                            )
+                          }
+                          options={roleOptions.filter((option) => {
                             if (option.value === 'OWNER') return false;
-                            if (currentUserParticipant?.role === 'ADMIN' && option.value === 'ADMIN') return false;
+                            if (
+                              currentUserParticipant?.role === 'ADMIN' &&
+                              option.value === 'ADMIN'
+                            )
+                              return false;
                             return true;
                           })}
                           placeholder="Select role"
@@ -283,14 +344,21 @@ export function CollaborationManager({
                       {participant.role !== 'OWNER' && (
                         <Button
                           variant="outline"
-                          onPress={() => handleRemoveParticipant(participant.id, participantName)}
-                          className="border-red-200 flex-row items-center justify-center"
+                          onPress={() =>
+                            handleRemoveParticipant(
+                              participant.id,
+                              participantName
+                            )
+                          }
+                          className="flex-row items-center justify-center border-red-200"
                         >
                           <Trash2 width={16} height={16} color="#EF4444" />
-                          <Text className="text-red-600 font-medium ml-2">Remove from Trip</Text>
+                          <Text className="ml-2 font-medium text-red-600">
+                            Remove from Trip
+                          </Text>
                         </Button>
                       )}
-                    </div>
+                    </View>
                   </View>
                 )}
               </View>
@@ -300,20 +368,26 @@ export function CollaborationManager({
       </ScrollView>
 
       {/* Role Legend */}
-      <View className="px-4 py-3 bg-gray-50 border-t border-gray-100">
-        <Text className="text-xs font-medium text-gray-600 mb-2">Role Permissions:</Text>
+      <View className="border-t border-gray-100 bg-gray-50 px-4 py-3">
+        <Text className="mb-2 text-xs font-medium text-gray-600">
+          Role Permissions:
+        </Text>
         <View className="space-y-1">
           <Text className="text-xs text-gray-500">
-            <Text className="font-medium">Owner:</Text> Full access, can transfer ownership
+            <Text className="font-medium">Owner:</Text> Full access, can
+            transfer ownership
           </Text>
           <Text className="text-xs text-gray-500">
-            <Text className="font-medium">Admin:</Text> Can invite, manage participants, edit trip
+            <Text className="font-medium">Admin:</Text> Can invite, manage
+            participants, edit trip
           </Text>
           <Text className="text-xs text-gray-500">
-            <Text className="font-medium">Member:</Text> Can view and contribute to trip
+            <Text className="font-medium">Member:</Text> Can view and contribute
+            to trip
           </Text>
           <Text className="text-xs text-gray-500">
-            <Text className="font-medium">Viewer:</Text> Can only view trip details
+            <Text className="font-medium">Viewer:</Text> Can only view trip
+            details
           </Text>
         </View>
       </View>

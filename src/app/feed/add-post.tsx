@@ -41,6 +41,7 @@ export default function AddTrip() {
   const onSubmit = (data: FormType) => {
     const tripData = {
       ...data,
+      tripType: 'LEISURE' as const,
       budgetAmount: data.budgetAmount
         ? parseFloat(data.budgetAmount)
         : undefined,

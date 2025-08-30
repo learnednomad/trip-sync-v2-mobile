@@ -1,25 +1,25 @@
 /**
  * Authentication Debug Panel Component
  * Add this component to your app temporarily to debug authentication issues
- * 
+ *
  * Usage:
  * Import and add <AuthDebugPanel /> to your main screen
  */
 
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  ScrollView, 
-  StyleSheet, 
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
   Alert,
-  ActivityIndicator 
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
+import { client } from '@/api/common/client';
 import { AuthDebugger } from '@/lib/auth/debug-utils';
 import { getToken } from '@/lib/auth/utils';
-import { client } from '@/api/common/client';
 
 interface DebugLog {
   timestamp: string;
@@ -30,14 +30,22 @@ interface DebugLog {
 export const AuthDebugPanel: React.FC = () => {
   const [logs, setLogs] = useState<DebugLog[]>([]);
   const [loading, setLoading] = useState(false);
-  const [tokenStatus, setTokenStatus] = useState<'none' | 'present' | 'checking'>('checking');
+  const [tokenStatus, setTokenStatus] = useState<
+    'none' | 'present' | 'checking'
+  >('checking');
 
-  const addLog = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
-    setLogs(prev => [...prev, {
-      timestamp: new Date().toLocaleTimeString(),
-      type,
-      message
-    }]);
+  const addLog = (
+    message: string,
+    type: 'info' | 'success' | 'error' = 'info'
+  ) => {
+    setLogs((prev) => [
+      ...prev,
+      {
+        timestamp: new Date().toLocaleTimeString(),
+        type,
+        message,
+      },
+    ]);
   };
 
   const clearLogs = () => setLogs([]);
@@ -49,12 +57,15 @@ export const AuthDebugPanel: React.FC = () => {
   const checkTokenStatus = () => {
     const token = getToken();
     setTokenStatus(token ? 'present' : 'none');
-    addLog(`Token status: ${token ? 'Present' : 'None'}`, token ? 'success' : 'error');
+    addLog(
+      `Token status: ${token ? 'Present' : 'None'}`,
+      token ? 'success' : 'error'
+    );
   };
 
   const runFullDiagnostics = () => {
     addLog('Running full authentication diagnostics...', 'info');
-    
+
     // Run all diagnostic functions
     setTimeout(() => {
       AuthDebugger.diagnoseToken();
@@ -67,7 +78,7 @@ export const AuthDebugPanel: React.FC = () => {
   const testApiConnectivity = async () => {
     setLoading(true);
     addLog('Testing API connectivity...', 'info');
-    
+
     try {
       await AuthDebugger.testApiConnectivity();
       addLog('API connectivity test complete - check console', 'success');
@@ -86,7 +97,7 @@ export const AuthDebugPanel: React.FC = () => {
 
     setLoading(true);
     addLog('Testing /api/v2/trips endpoint...', 'info');
-    
+
     try {
       const response = await client.get('/api/v2/trips');
       addLog('✅ Trip API call successful!', 'success');
@@ -113,17 +124,23 @@ export const AuthDebugPanel: React.FC = () => {
 
   const getStatusColor = () => {
     switch (tokenStatus) {
-      case 'present': return '#4CAF50';
-      case 'none': return '#F44336';
-      case 'checking': return '#FF9800';
+      case 'present':
+        return '#4CAF50';
+      case 'none':
+        return '#F44336';
+      case 'checking':
+        return '#FF9800';
     }
   };
 
   const getStatusText = () => {
     switch (tokenStatus) {
-      case 'present': return '✅ Token Present';
-      case 'none': return '❌ No Token';
-      case 'checking': return '🔍 Checking...';
+      case 'present':
+        return '✅ Token Present';
+      case 'none':
+        return '❌ No Token';
+      case 'checking':
+        return '🔍 Checking...';
     }
   };
 
@@ -132,7 +149,10 @@ export const AuthDebugPanel: React.FC = () => {
       {/* Status Header */}
       <View style={[styles.statusBar, { backgroundColor: getStatusColor() }]}>
         <Text style={styles.statusText}>{getStatusText()}</Text>
-        <TouchableOpacity onPress={checkTokenStatus} style={styles.refreshButton}>
+        <TouchableOpacity
+          onPress={checkTokenStatus}
+          style={styles.refreshButton}
+        >
           <Text style={styles.refreshButtonText}>🔄</Text>
         </TouchableOpacity>
       </View>
@@ -140,41 +160,44 @@ export const AuthDebugPanel: React.FC = () => {
       {/* Action Buttons */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>🔧 Actions</Text>
-        
-        <TouchableOpacity 
-          style={styles.button} 
+
+        <TouchableOpacity
+          style={styles.button}
           onPress={runFullDiagnostics}
           disabled={loading}
         >
           <Text style={styles.buttonText}>🔍 Run Full Diagnostics</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.button} 
+        <TouchableOpacity
+          style={styles.button}
           onPress={testApiConnectivity}
           disabled={loading}
         >
           <Text style={styles.buttonText}>🌐 Test API Connectivity</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.button, tokenStatus === 'none' && styles.buttonDisabled]} 
+        <TouchableOpacity
+          style={[
+            styles.button,
+            tokenStatus === 'none' && styles.buttonDisabled,
+          ]}
           onPress={testTripApiCall}
           disabled={loading || tokenStatus === 'none'}
         >
           <Text style={styles.buttonText}>📡 Test Trip API Call</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.button, styles.buttonSecondary]} 
+        <TouchableOpacity
+          style={[styles.button, styles.buttonSecondary]}
           onPress={createTestToken}
           disabled={loading}
         >
           <Text style={styles.buttonText}>🧪 Create Test Token</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.button, styles.buttonDanger]} 
+        <TouchableOpacity
+          style={[styles.button, styles.buttonDanger]}
           onPress={clearAuth}
           disabled={loading}
         >
@@ -203,12 +226,17 @@ export const AuthDebugPanel: React.FC = () => {
           {logs.length === 0 ? (
             <Text style={styles.noLogsText}>No logs yet - run some tests!</Text>
           ) : (
-            logs.map((log, index) => (
-              <View key={index} style={[styles.logItem, styles[`log${log.type.charAt(0).toUpperCase() + log.type.slice(1)}`]]}>
-                <Text style={styles.logTimestamp}>{log.timestamp}</Text>
-                <Text style={styles.logMessage}>{log.message}</Text>
-              </View>
-            ))
+            logs.map((log, index) => {
+              const logStyleKey =
+                `log${log.type.charAt(0).toUpperCase() + log.type.slice(1)}` as keyof typeof styles;
+              const logStyle = styles[logStyleKey] || {};
+              return (
+                <View key={index} style={[styles.logItem, logStyle as any]}>
+                  <Text style={styles.logTimestamp}>{log.timestamp}</Text>
+                  <Text style={styles.logMessage}>{log.message}</Text>
+                </View>
+              );
+            })
           )}
         </View>
       </View>
@@ -218,7 +246,7 @@ export const AuthDebugPanel: React.FC = () => {
         <Text style={styles.sectionTitle}>📖 Instructions</Text>
         <Text style={styles.instructionText}>
           1. Run "Full Diagnostics" to check current auth state{'\n'}
-          2. Check console logs for detailed output{'\n'}  
+          2. Check console logs for detailed output{'\n'}
           3. Use "Test API Connectivity" to verify backend is reachable{'\n'}
           4. Try "Test Trip API Call" to reproduce the 401 error{'\n'}
           5. All detailed logs appear in React Native console
