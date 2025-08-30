@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] - 2025-08-30
+## [0.1.0] - 2025-08-30 ✅ **DEPLOYED**
 
 ### 🎉 Major UI/UX Overhaul - Accessibility & Design System Enhancement
 
@@ -36,6 +36,13 @@ This release represents a comprehensive UI audit and upgrade, bringing the appli
 - **Component Specifications**: Detailed platform guidelines for all UI components
 
 ### 🔧 Changed
+
+#### ✅ **Successfully Deployed Improvements** (Verified in iOS Simulator)
+- **Personalized Welcome Message**: "Welcome back, Traveler!" now displays correctly
+- **Enhanced Touch Targets**: All buttons now meet 44pt minimum requirement 
+- **Improved Visual Spacing**: Consistent 20px horizontal padding throughout
+- **Better Button Sizing**: Default buttons increased from 40px to 48px height
+- **Runtime Stability**: Fixed isDarkMode variable scope issues
 
 #### Navigation Improvements
 - **Tab Bar Enhancement**: Increased padding and spacing for better touch targets
