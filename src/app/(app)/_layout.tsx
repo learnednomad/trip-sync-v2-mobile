@@ -103,7 +103,7 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-              name="trips"
+              name="trips/index"
               options={{
                 title: 'My Trips',
                 tabBarAccessibilityLabel: 'My Trips, tab 2 of 4',
@@ -138,6 +138,26 @@ export default function TabLayout() {
                 headerShown: false,
                 tabBarIcon: ({ color }) => <SettingsIcon color={color} />,
                 tabBarButtonTestID: 'settings-tab',
+              }}
+            />
+            
+            {/* Hide unwanted routes from tab bar */}
+            <Tabs.Screen
+              name="trips/[id]"
+              options={{
+                href: null, // Hide from tab bar
+              }}
+            />
+            <Tabs.Screen
+              name="trips/create"
+              options={{
+                href: null, // Hide from tab bar
+              }}
+            />
+            <Tabs.Screen
+              name="style"
+              options={{
+                href: null, // Hide from tab bar
               }}
             />
           </Tabs>
