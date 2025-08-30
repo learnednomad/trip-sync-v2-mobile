@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
 const button = tv({
   slots: {
     container:
-      'my-2 flex flex-row items-center justify-center rounded-lg px-4 transition-all duration-200',
+      'my-2 flex flex-row items-center justify-center rounded-lg px-4 transition-all duration-200 min-h-[44px]', // WCAG minimum touch target
     label: 'font-inter text-base font-semibold',
     indicator: 'h-6 text-white',
   },
@@ -64,15 +64,15 @@ const button = tv({
     },
     size: {
       default: {
-        container: 'h-10 px-4',
+        container: 'h-12 px-4', // Increased for better touch targets
         label: 'text-base',
       },
       lg: {
-        container: 'h-12 px-8',
+        container: 'h-14 px-8', // Increased for better accessibility
         label: 'text-xl',
       },
       sm: {
-        container: 'h-8 px-3',
+        container: 'h-10 px-3', // Increased to meet minimum 44pt requirement
         label: 'text-sm',
         indicator: 'h-2',
       },
@@ -108,6 +108,11 @@ interface Props extends ButtonVariants, Omit<PressableProps, 'disabled'> {
   loading?: boolean;
   className?: string;
   textClassName?: string;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  accessibilityRole?: 'button' | 'link' | 'tab' | 'switch';
+  accessibilityState?: { disabled?: boolean; selected?: boolean };
+  onLongPress?: () => void;
 }
 
 export const Button = React.forwardRef<View, Props>(
@@ -121,6 +126,10 @@ export const Button = React.forwardRef<View, Props>(
       className = '',
       testID,
       textClassName = '',
+      accessibilityLabel,
+      accessibilityHint,
+      accessibilityRole = 'button',
+      accessibilityState,
       ...props
     },
     ref
@@ -134,9 +143,26 @@ export const Button = React.forwardRef<View, Props>(
       <Pressable
         disabled={disabled || loading}
         className={styles.container({ className })}
+        accessible={true}
+        accessibilityRole={accessibilityRole}
+        accessibilityLabel={accessibilityLabel || text || 'Button'}
+        accessibilityHint={accessibilityHint}
+        accessibilityState={{
+          disabled: disabled || loading,
+          busy: loading,
+          ...accessibilityState,
+        }}
+        android_ripple={{
+          color: variant === 'ghost' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.2)',
+          borderless: false,
+        }}
         {...props}
         ref={ref}
         testID={testID}
+        style={({ pressed }) => [
+          props.style,
+          pressed && { opacity: 0.8, transform: [{ scale: 0.98 }] }
+        ]}
       >
         {props.children ? (
           props.children
@@ -145,6 +171,7 @@ export const Button = React.forwardRef<View, Props>(
             {loading ? (
               <ActivityIndicator
                 size="small"
+                accessibilityLabel="Loading"
                 className={styles.indicator()}
                 testID={testID ? `${testID}-activity-indicator` : undefined}
               />
@@ -152,6 +179,8 @@ export const Button = React.forwardRef<View, Props>(
               <Text
                 testID={testID ? `${testID}-label` : undefined}
                 className={styles.label({ className: textClassName })}
+                maxFontSizeMultiplier={2} // Support Dynamic Type scaling
+                allowFontScaling={true}
               >
                 {text}
               </Text>

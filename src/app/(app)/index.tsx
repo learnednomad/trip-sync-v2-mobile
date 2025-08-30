@@ -50,9 +50,15 @@ export default function Home() {
       <FocusAwareStatusBar />
 
       {/* Welcome Header */}
-      <View className="px-4 pb-6 pt-4">
-        <Text className="mb-1 text-2xl font-bold text-neutral-900 dark:text-white">
-          Welcome back! 👋
+      <View 
+        className="px-4 pb-6 pt-4"
+        accessibilityRole="banner"
+        accessibilityLabel="Welcome section">
+        <Text 
+          className="mb-1 text-2xl font-bold text-neutral-900 dark:text-white"
+          accessibilityRole="header"
+          accessibilityLevel={1}>
+          Welcome back{user ? ', ' + (user.name || 'Traveler') : ''}! 👋
         </Text>
         <Text className="text-neutral-600 dark:text-neutral-400">
           Ready for your next adventure?
@@ -60,7 +66,11 @@ export default function Home() {
       </View>
 
       {/* Quick Stats */}
-      <View className="mb-6 px-4">
+      <View 
+        className="mb-6 px-4"
+        accessibilityRole="region"
+        accessibilityLabel="Trip statistics">
+        <Text className="sr-only">Your trip statistics at a glance</Text>
         <View className="flex-row space-x-3">
           <Card className="flex-1" variant="elevated">
             <Card.Body className="items-center">
